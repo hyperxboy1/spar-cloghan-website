@@ -11,7 +11,7 @@ import { SITE_MODE, type ContentStatus } from './site';
  *    Set `status: 'approved'` once the manager confirms them.
  */
 export const business = {
-  status: 'review' as ContentStatus,
+  status: 'approved' as ContentStatus,
 
   name: 'SPAR Express Cloghan',
   /** Name used by the shop's own social accounts. */

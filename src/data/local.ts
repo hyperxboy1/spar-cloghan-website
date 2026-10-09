@@ -6,15 +6,15 @@ import type { ContentStatus } from './site';
  */
 export const local = {
   heading: 'Proud to be part of Cloghan',
-  headingStatus: 'review' as ContentStatus,
+  headingStatus: 'approved' as ContentStatus,
   body: "You'll find us on Hill Street, Cloghan — the SPAR Express shop on the Healy's forecourt. Pop in for the deli, a coffee or the everyday bits.",
-  bodyStatus: 'review' as ContentStatus,
+  bodyStatus: 'approved' as ContentStatus,
 
   facts: [
-    { icon: 'pin', label: 'Hill Street, Cloghan', status: 'review' as ContentStatus },
-    { icon: 'bag', label: 'SPAR Express shop', status: 'review' as ContentStatus },
-    { icon: 'fuel', label: 'Maxol forecourt', status: 'review' as ContentStatus },
-    { icon: 'cup', label: 'Deli, coffee & bakery', status: 'review' as ContentStatus },
+    { icon: 'pin', label: 'Hill Street, Cloghan', status: 'approved' as ContentStatus },
+    { icon: 'bag', label: 'SPAR Express shop', status: 'approved' as ContentStatus },
+    { icon: 'fuel', label: 'Maxol forecourt', status: 'approved' as ContentStatus },
+    { icon: 'cup', label: 'Deli, coffee & bakery', status: 'approved' as ContentStatus },
   ],
 
   /**
@@ -27,6 +27,6 @@ export const local = {
     year: '2024',
     name: 'SPAR 365 Retailing Standards Award',
     note: "Healy's SPAR, Cloghan — as reported by the Offaly Independent, July 2024.",
-    status: 'review' as ContentStatus,
+    status: 'approved' as ContentStatus,
   },
 };

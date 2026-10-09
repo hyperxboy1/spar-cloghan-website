@@ -20,9 +20,9 @@ export interface HoursRow {
 }
 
 export const hours = {
-  approved: false,
+  approved: true, // confirmed by the manager, Oct 2026
   fallbackMessage: "Please call for today's opening hours.",
-  store: [] as HoursRow[],
+  store: [{ days: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], opens: '06:00', closes: '22:00' }] as HoursRow[],
   deli: [] as HoursRow[],
   /** Bank-holiday / Christmas exceptions, e.g. { date: '2026-12-25', label: 'Christmas Day', note: 'Closed' } */
   exceptions: [] as Array<{ date: string; label: string; note: string }>,

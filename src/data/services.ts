@@ -27,7 +27,7 @@ export const services: Service[] = [
     label: 'Fuel',
     detail: 'Maxol forecourt',
     icon: 'fuel',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -35,7 +35,7 @@ export const services: Service[] = [
     label: 'Pay at pump',
     detail: 'Fill up and go',
     icon: 'card',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -43,7 +43,7 @@ export const services: Service[] = [
     label: 'ATM',
     detail: 'Cash machine on site',
     icon: 'atm',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -51,7 +51,7 @@ export const services: Service[] = [
     label: 'Bill & toll payments',
     detail: 'Pay at the counter',
     icon: 'receipt',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -59,7 +59,7 @@ export const services: Service[] = [
     label: 'Off-licence',
     detail: 'Over-18s only',
     icon: 'bottle',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -67,7 +67,7 @@ export const services: Service[] = [
     label: 'Seating',
     detail: 'Sit down with your coffee',
     icon: 'seat',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {
@@ -75,7 +75,7 @@ export const services: Service[] = [
     label: 'Customer toilets',
     detail: 'For customers',
     icon: 'toilet',
-    status: 'review',
+    status: 'approved',
     source: 'Maxol location page',
   },
   {

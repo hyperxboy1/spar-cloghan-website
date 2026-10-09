@@ -33,7 +33,7 @@ export const counter: CounterItem[] = [
     image: 'deliSandwich',
     panelWord: 'Deli',
     panelNote: 'Fresh photo coming soon',
-    status: 'review',
+    status: 'approved',
   },
   {
     id: 'coffee',
@@ -43,7 +43,7 @@ export const counter: CounterItem[] = [
     image: 'latte',
     panelWord: 'Coffee',
     panelNote: 'Fresh photo coming soon',
-    status: 'review',
+    status: 'approved',
   },
   {
     id: 'bakery',
@@ -53,6 +53,6 @@ export const counter: CounterItem[] = [
     image: null,
     panelWord: 'Bakery',
     panelNote: 'Shop photo to follow',
-    status: 'review',
+    status: 'approved',
   },
 ];
