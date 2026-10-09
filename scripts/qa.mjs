@@ -349,7 +349,7 @@ for (const [w, h] of [
     };
     return {
       h1: visible('#hero-title'),
-      sections: ['#so-title', '#counter-title', '#services-title', '#local-title', '#visit-title'].map(visible),
+      sections: ['#so-title', '#fm-title', '#services-title', '#local-title', '#visit-title'].map(visible),
       mobileLinks: [...document.querySelectorAll('[data-menu] a')].filter((a) => a.getBoundingClientRect().width > 0).length,
       offersEmpty: visible('.so-card'),
       heroImg: visible('.hero__fg img'),
@@ -384,17 +384,13 @@ for (const [w, h] of [
   }
   record('focused controls show a visible focus outline', outlines === 8, `${outlines}/8`);
   // Counter picture selector works from the keyboard (desktop).
-  await page.evaluate(() => document.getElementById('counter').scrollIntoView());
+  await page.evaluate(() => document.getElementById('menu').scrollIntoView({ behavior: 'instant' }));
   await page.waitForTimeout(500);
-  await page.focus('[data-counter-select="coffee"]');
-  await page.waitForTimeout(50);
+  await page.focus('.fm-tile[href="#menu-dinner"]');
   await page.keyboard.press('Enter');
-  await page.waitForTimeout(300);
-  const sel = await page.evaluate(() => ({
-    pressed: document.querySelector('[data-counter-select="coffee"]').getAttribute('aria-pressed'),
-    active: document.querySelector('[data-counter-media][data-active]')?.dataset.counterMedia,
-  }));
-  record('counter picture selector works with the keyboard', sel.pressed === 'true' && sel.active === 'coffee', JSON.stringify(sel));
+  await page.waitForTimeout(2500);
+  const sel = await page.evaluate(() => ({ hash: location.hash, top: Math.round(document.getElementById('menu-dinner').getBoundingClientRect().top) }));
+  record('food menu tile opens its category with the keyboard', sel.hash === '#menu-dinner' && sel.top < 200, JSON.stringify(sel));
   await ctx.close();
 }
 

@@ -18,10 +18,10 @@ export const sections = {
 };
 
 /** Where "Explore the store" leads: the food showcase if it is published, otherwise services. */
-export const exploreHref = sections.counter ? '#counter' : '#services';
+export const exploreHref = '#menu';
 
 export const navLinks = [
-  sections.counter && { href: '#counter', label: 'Deli & coffee' },
+  { href: '#menu', label: 'Food menu' },
   { href: '#special-offers', label: 'Offers' },
   { href: '#services', label: 'Services' },
   sections.local && { href: '#local', label: 'Our shop' },
