@@ -1,0 +1,104 @@
+---
+/**
+ * Catering enquiry feature — HIDDEN until the manager confirms the service
+ * (src/data/catering.ts). Contact routes only: phone and the shop's Facebook page.
+ */
+import Icon from './Icon.astro';
+import Tbc from './Tbc.astro';
+import { catering } from '../data/catering';
+import { business } from '../data/business';
+import { isShown } from '../data/site';
+---
+
+{
+  isShown(catering.status) && (
+    <section class="catering" id="catering" aria-labelledby="catering-title">
+      <div class="pop catering__card">
+        <div class="pop__body catering__body">
+          <div class="catering__art" aria-hidden="true">
+            <span class="display">Catering</span>
+            <span class="hand">for get-togethers</span>
+          </div>
+          <div class="catering__text">
+            <p class="kicker">
+              {catering.kicker} <Tbc status={catering.status} />
+            </p>
+            <h2 id="catering-title" class="serif catering__title">
+              {catering.title}
+            </h2>
+            <p>{catering.body}</p>
+            <div class="catering__actions">
+              <a class="btn btn--red" href={business.phone.href} data-magnetic>
+                <span class="btn__inner">
+                  <Icon name="phone" size={18} /> Call {business.phone.display}
+                </span>
+              </a>
+              <a class="btn" href={business.social.facebook.url} target="_blank" rel="noopener" data-magnetic>
+                <span class="btn__inner">
+                  <Icon name="message" size={18} /> Message us on Facebook
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .catering {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin: 0 auto var(--section-y);
+  }
+  .catering__body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: var(--shadow-2);
+  }
+  .catering__art {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 6px;
+    padding: 40px 24px;
+    background: var(--ink);
+    color: #fff;
+    text-align: center;
+  }
+  .catering__art .display {
+    font-size: clamp(3rem, 2rem + 4vw, 5.6rem);
+    color: var(--glow);
+    transform: rotate(-4deg);
+  }
+  .catering__art .hand {
+    font-size: 1.7rem;
+  }
+  .catering__text {
+    display: grid;
+    gap: 14px;
+    padding: clamp(28px, 4vw, 52px);
+    align-content: center;
+  }
+  .catering__title {
+    font-size: var(--step-3);
+  }
+  .catering__text > p:not(.kicker) {
+    color: var(--muted);
+    max-width: 52ch;
+  }
+  .catering__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  @media (max-width: 860px) {
+    .catering__body {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

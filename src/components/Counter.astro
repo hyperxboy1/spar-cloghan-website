@@ -1,0 +1,457 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import Tbc from './Tbc.astro';
+import { counter } from '../data/counter';
+import { useImage } from '../data/images';
+import { business } from '../data/business';
+import { isShown, IS_REVIEW } from '../data/site';
+
+const items = counter.filter((c) => isShown(c.status)).map((c) => ({ ...c, img: c.image ? useImage(c.image) : null }));
+const headingWords = items.map((i) => i.panelWord);
+---
+
+{
+  items.length > 0 && (
+    <section class="counter on-red" id="counter" aria-labelledby="counter-title" data-counter>
+      <div class="counter__inner">
+        <header class="counter__head">
+          <p class="kicker counter__kicker">At the counter</p>
+          <h2 id="counter-title" class="display counter__title">
+            {headingWords.map((w) => (
+              <span class="counter__word">
+                <span>{w}.</span>
+              </span>
+            ))}
+          </h2>
+          <p class="counter__intro">
+            There’s no menu on the website — what’s on changes through the day. Call the shop and the team will tell you.
+          </p>
+        </header>
+
+        <div class="counter__layout">
+          <!-- Desktop: one sticky frame; the active block's image is revealed with a wipe. -->
+          <div class="counter__sticky" aria-hidden="true">
+            <div class="counter__frame">
+              {items.map((item, i) => (
+                <div class="counter__media" data-counter-media={item.id} data-active={i === 0 ? '' : undefined}>
+                  {item.img ? (
+                    <Picture
+                      src={item.img.src}
+                      alt=""
+                      formats={['avif']}
+                      fallbackFormat="webp"
+                      widths={[420, 640, 860]}
+                      sizes="(max-width: 860px) 0px, 38vw"
+                      quality={70}
+                      loading="lazy"
+                      decoding="async"
+                      style={`object-position:${item.img.focal.desktop}`}
+                    />
+                  ) : (
+                    <div class="counter__panel">
+                      <span class="counter__panel-word display">{item.panelWord}</span>
+                      <span class="counter__panel-note hand">Ask what’s on the counter today</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <span class="counter__frame-label hand">{business.address.street}, {business.address.town}</span>
+            </div>
+          </div>
+
+          <ol class="counter__list" role="list">
+            {items.map((item, i) => (
+              <li class="counter__item" data-counter-item={item.id}>
+                <article class="pop counter__card">
+                  <div class="pop__body counter__card-body">
+                    <div class="counter__inline-media">
+                      {item.img ? (
+                        <Picture
+                          src={item.img.src}
+                          alt={item.img.alt}
+                          formats={['avif']}
+                          fallbackFormat="webp"
+                          widths={[360, 560, 760]}
+                          sizes="(max-width: 860px) 92vw, 0px"
+                          quality={68}
+                          loading="lazy"
+                          decoding="async"
+                          style={`object-position:${item.img.focal.mobile}`}
+                        />
+                      ) : (
+                        <div class="counter__panel counter__panel--inline" aria-hidden="true">
+                          <span class="counter__panel-word display">{item.panelWord}</span>
+                        </div>
+                      )}
+                    </div>
+                    <p class="counter__num" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </p>
+                    <p class="counter__item-kicker">
+                      {item.kicker} <Tbc status={item.status} />
+                    </p>
+                    <h3 class="counter__item-title serif">
+                      <span class="counter__title-plain">{item.title}</span>
+                      <button
+                        type="button"
+                        class="counter__select"
+                        data-counter-select={item.id}
+                        aria-pressed={i === 0 ? 'true' : 'false'}
+                      >
+                        {item.title}
+                        <span class="visually-hidden"> — show picture</span>
+                      </button>
+                    </h3>
+                    <p class="counter__body">{item.body}</p>
+                    {IS_REVIEW && !item.img && <p class="counter__missing">Photo needed: {item.panelNote.toLowerCase()}.</p>}
+                    <a class="btn btn--small counter__call" href={business.phone.href}>
+                      <span class="btn__inner">
+                        <Icon name="phone" size={18} />
+                        Call the shop
+                      </span>
+                    </a>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .counter {
+    position: relative;
+    margin-top: var(--section-y);
+    background:
+      radial-gradient(90% 60% at 100% 0%, rgb(255 90 90 / 0.25), transparent 60%),
+      linear-gradient(180deg, var(--red) 0%, var(--red-600) 100%);
+    color: #fff;
+    overflow: clip;
+  }
+  .counter::before {
+    /* subtle paper grain via repeating gradient — no image request */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1.2px);
+    background-size: 6px 6px;
+    pointer-events: none;
+  }
+  .counter__inner {
+    position: relative;
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+    padding-block: var(--section-y);
+  }
+  .counter__head {
+    display: grid;
+    gap: 18px;
+    max-width: 980px;
+    margin-bottom: clamp(40px, 6vw, 80px);
+  }
+  .counter__kicker {
+    color: #ffd7d2;
+  }
+  .counter__title {
+    font-size: clamp(3.4rem, 1.6rem + 7.6vw, 9.5rem);
+    line-height: 0.86;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.22em;
+  }
+  .counter__word {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 0.04em;
+  }
+  .counter__word > span {
+    display: inline-block;
+  }
+  .counter__word:nth-child(2) > span {
+    color: var(--cream);
+    -webkit-text-stroke: 0;
+  }
+  .counter__word:nth-child(3) > span {
+    color: transparent;
+    -webkit-text-stroke: 2px #fff;
+  }
+  .counter__intro {
+    max-width: 52ch;
+    font-size: var(--step-1);
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .counter__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .counter__sticky {
+    position: sticky;
+    top: calc(var(--header-h) + 32px);
+  }
+  .counter__frame {
+    position: relative;
+    aspect-ratio: 4 / 4.6;
+    width: min(100%, 500px, calc((100vh - var(--header-h) - 96px) / 1.15));
+    margin-inline: auto;
+    border-radius: var(--radius-l);
+    background: var(--red-700);
+    box-shadow: 0 50px 80px -40px rgb(40 0 6 / 0.75), 0 0 0 8px rgb(255 255 255 / 0.95);
+    transform: rotate(-2deg);
+  }
+  .counter__media {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    clip-path: inset(100% 0 0 0 round var(--radius-l));
+    transition: clip-path 760ms var(--ease-in-out);
+  }
+  .counter__media[data-active] {
+    clip-path: inset(0 0 0 0 round var(--radius-l));
+    z-index: 1;
+  }
+  .counter__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    transition: transform 1200ms var(--ease-out);
+  }
+  .counter__media[data-active] :global(img) {
+    transform: scale(1);
+  }
+  .counter__panel {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 16px;
+    background:
+      radial-gradient(circle at 50% 40%, #fff6e6, var(--cream) 60%, var(--cream-2));
+    color: var(--red);
+    text-align: center;
+  }
+  .counter__panel-word {
+    font-size: clamp(4rem, 9vw, 9rem);
+    line-height: 0.85;
+    transform: rotate(-6deg);
+  }
+  .counter__panel-note {
+    font-size: 1.8rem;
+    color: var(--ink);
+  }
+  .counter__frame-label {
+    position: absolute;
+    z-index: 3;
+    right: -18px;
+    bottom: 26px;
+    padding: 6px 16px 8px;
+    border-radius: 8px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 1.4rem;
+    line-height: 1;
+    transform: rotate(-4deg);
+    box-shadow: var(--shadow-2);
+  }
+
+  .counter__list {
+    display: grid;
+    gap: clamp(24px, 4vw, 40px);
+    padding-block: 2vh 6vh;
+  }
+  .counter__item {
+    min-height: 48vh;
+    display: flex;
+    align-items: center;
+  }
+  .counter__card {
+    width: 100%;
+  }
+  .counter__card-body {
+    padding: clamp(24px, 3vw, 40px);
+    border-radius: var(--radius-l);
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.22);
+    transition:
+      transform 460ms var(--ease-pop),
+      box-shadow 460ms var(--ease-out),
+      background-color 460ms var(--ease-out);
+  }
+  .counter__card:is(:hover, :focus-within) .counter__card-body {
+    background: rgb(255 255 255 / 0.14);
+    box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.4), 0 40px 60px -30px rgb(40 0 6 / 0.6);
+  }
+  .counter__item.is-active .counter__card-body {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 40px 60px -30px rgb(40 0 6 / 0.6);
+  }
+  .counter__num {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+  .counter__item-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .counter__item.is-active .counter__item-kicker {
+    color: var(--green);
+  }
+  .counter__item-title {
+    margin-top: 10px;
+    font-size: var(--step-3);
+    line-height: 1.05;
+  }
+  /* The picture selector only exists where it does something: desktop with JavaScript. */
+  .counter__select {
+    display: none;
+  }
+  @media (min-width: 861px) {
+    :global(.js) .counter__select {
+      display: inline;
+    }
+    :global(.js) .counter__title-plain {
+      display: none;
+    }
+  }
+  .counter__select {
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: rgb(255 255 255 / 0.35);
+    transition: text-decoration-color var(--dur) var(--ease-out);
+  }
+  .counter__select:hover {
+    text-decoration-color: currentColor;
+  }
+  .counter__item.is-active .counter__select {
+    text-decoration-color: var(--red);
+  }
+  .counter__body {
+    margin-top: 14px;
+    max-width: 46ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .counter__missing {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.8;
+  }
+  .counter__call {
+    margin-top: 22px;
+  }
+  .counter__call :global(.icon) {
+    color: var(--red);
+  }
+  .counter__item:not(.is-active) .counter__call {
+    --btn-bg: transparent;
+    --btn-fg: #fff;
+    --btn-border: rgb(255 255 255 / 0.5);
+  }
+  .counter__item:not(.is-active) .counter__call :global(.icon) {
+    color: #fff;
+  }
+  .counter__inline-media {
+    display: none;
+  }
+  .counter__item.is-active :global(.tbc),
+  :global(.no-js) .counter__card-body :global(.tbc) {
+    color: #8a5a00;
+    background: rgb(255 214 120 / 0.25);
+  }
+  .on-red .counter__item.is-active :focus-visible {
+    outline-color: var(--red);
+  }
+
+  /* No JS: every block reads as "active" (light cards), nothing depends on scripting. */
+  :global(.no-js) .counter__card-body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  :global(.no-js) .counter__item-kicker {
+    color: var(--green);
+  }
+
+  @media (max-width: 860px) {
+    .counter__layout {
+      display: block;
+    }
+    .counter__sticky {
+      display: none;
+    }
+    .counter__list {
+      padding-block: 0;
+    }
+    .counter__item {
+      min-height: 0;
+    }
+    .counter__card-body,
+    .counter__item .counter__card-body {
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 30px 50px -30px rgb(40 0 6 / 0.6);
+    }
+    .counter__item-kicker {
+      color: var(--green);
+    }
+    .counter__item :global(.tbc) {
+      color: #8a5a00;
+      background: rgb(255 214 120 / 0.25);
+    }
+    .counter__item:not(.is-active) .counter__call {
+      --btn-bg: var(--paper);
+      --btn-fg: var(--ink);
+      --btn-border: rgb(20 17 13 / 0.14);
+    }
+    .counter__item:not(.is-active) .counter__call :global(.icon) {
+      color: var(--red);
+    }
+    .counter__select {
+      text-decoration-color: var(--red);
+    }
+    .counter__inline-media {
+      display: block;
+      position: relative;
+      aspect-ratio: 4 / 3;
+      margin: calc(-1 * clamp(24px, 3vw, 40px)) calc(-1 * clamp(24px, 3vw, 40px)) 18px;
+      border-radius: var(--radius-l) var(--radius-l) 0 0;
+      overflow: hidden;
+      background: var(--cream-3);
+    }
+    .counter__inline-media :global(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .counter__panel--inline .counter__panel-word {
+      font-size: 22vw;
+    }
+  }
+</style>

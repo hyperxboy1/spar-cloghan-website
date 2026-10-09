@@ -1,0 +1,76 @@
+---
+/**
+ * Decorative typographic band between the cards and the counter section.
+ * Static by default; on desktop with motion allowed, scroll-scenes.ts slides the two rows
+ * in opposite directions (scrubbed to scroll, no autoplay).
+ */
+import { counter } from '../data/counter';
+import { business } from '../data/business';
+import { isShown } from '../data/site';
+
+const words = [...counter.filter((c) => isShown(c.status)).map((c) => c.panelWord), business.address.street, business.address.town];
+const row = [...words, ...words, ...words];
+---
+
+<div class="marquee" aria-hidden="true" data-marquee>
+  <div class="marquee__row" data-marquee-row="1">
+    {
+      row.map((w) => (
+        <span>
+          {w}
+          <i />
+        </span>
+      ))
+    }
+  </div>
+  <div class="marquee__row marquee__row--outline" data-marquee-row="-1">
+    {
+      row.map((w) => (
+        <span>
+          {w}
+          <i />
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    margin-top: clamp(64px, 9vw, 120px);
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+  .marquee__row {
+    display: flex;
+    width: max-content;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(3rem, 1.6rem + 6vw, 7.5rem);
+    line-height: 0.95;
+    color: var(--ink);
+    transform: translate3d(-8%, 0, 0);
+  }
+  .marquee__row--outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--red);
+    transform: translate3d(-22%, 0, 0);
+  }
+  .marquee__row span {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .marquee__row i {
+    display: inline-block;
+    width: 0.32em;
+    height: 0.32em;
+    margin-inline: 0.36em;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .marquee__row--outline i {
+    background: var(--green);
+  }
+</style>

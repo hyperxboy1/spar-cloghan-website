@@ -1,0 +1,471 @@
+/* ==========================================================================
+   SPAR Express Cloghan — global styles
+   Tokens · fonts · base · shared components (buttons, markers, pop cards)
+   ========================================================================== */
+
+/* ---------- Fonts (self-hosted, SIL Open Font License — see src/assets/fonts) ---------- */
+@font-face {
+  font-family: 'Anton';
+  src: url('../assets/fonts/anton-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('../assets/fonts/fraunces-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('../assets/fonts/caveat-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+/* Metric-adjusted fallbacks keep the layout steady while web fonts load. */
+@font-face {
+  font-family: 'Anton Fallback';
+  src: local('Arial Narrow Bold'), local('ArialNarrow-Bold'), local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('Arial');
+  size-adjust: 74%;
+  ascent-override: 128%;
+  descent-override: 36%;
+}
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Helvetica');
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22%;
+}
+
+/* ---------- Tokens ---------- */
+:root {
+  color-scheme: light;
+
+  /* Brand palette — provisional, sampled from the design reference.
+     Re-extract from approved SPAR brand assets before launch. */
+  --cream: #f8f0e1;
+  --cream-2: #f1e4cc;
+  --cream-3: #e8d8bb;
+  --paper: #fffaf1;
+  --ink: #14110d;
+  --ink-2: #3a332b;
+  --muted: #62584c;
+  --line: rgb(20 17 13 / 0.12);
+
+  --red: #c8102e;
+  --red-600: #b00c26;
+  --red-700: #8e0a1e;
+  --red-tint: #f7d9d4;
+  --green: #0c4a33;
+  --green-900: #0a3324;
+  --green-600: #13704c;
+  --glow: #ffe6a3;
+
+  /* Type */
+  --font-display: 'Anton', 'Anton Fallback', Impact, 'Arial Narrow', sans-serif;
+  --font-sans: 'Inter Variable', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+
+  --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.9rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
+  --step-2: clamp(1.4rem, 1.25rem + 0.7vw, 1.85rem);
+  --step-3: clamp(1.8rem, 1.5rem + 1.4vw, 2.7rem);
+  --step-4: clamp(2.6rem, 1.9rem + 3.4vw, 4.8rem);
+  --step-5: clamp(3.4rem, 2rem + 6.6vw, 8.4rem);
+
+  /* Space & shape */
+  --gutter: clamp(16px, 4vw, 56px);
+  --maxw: 1360px;
+  --section-y: clamp(72px, 9vw, 140px);
+  --radius-s: 10px;
+  --radius-m: 18px;
+  --radius-l: 28px;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgb(52 28 14 / 0.08), 0 10px 24px -14px rgb(52 28 14 / 0.35);
+  --shadow-2: 0 2px 4px rgb(52 28 14 / 0.08), 0 24px 44px -22px rgb(52 28 14 / 0.5);
+  --shadow-pop: 0 4px 10px rgb(52 28 14 / 0.1), 0 34px 60px -24px rgb(70 22 10 / 0.55);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 0.9, 0.25, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-pop: cubic-bezier(0.3, 1.35, 0.55, 1);
+  --dur-fast: 180ms;
+  --dur: 320ms;
+  --dur-slow: 640ms;
+
+  --header-h: 72px;
+  --dock-h: 0px;
+}
+@media (max-width: 860px) {
+  :root {
+    --header-h: 62px;
+    --dock-h: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- Reset / base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  padding-bottom: var(--dock-h);
+  overflow-x: clip;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+/* <picture> only chooses a source; let the <img> size itself against the frame. */
+picture {
+  display: contents;
+}
+img {
+  height: auto;
+}
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+::selection {
+  background: var(--red);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* Skip-link target: receives focus programmatically, no outline needed around the whole page. */
+#main:focus {
+  outline: none;
+}
+.on-dark :focus-visible,
+.on-red :focus-visible {
+  outline-color: #fff;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -100px;
+  z-index: 100;
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: var(--radius-s);
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+.container {
+  width: min(100% - 2 * var(--gutter), var(--maxw));
+  margin-inline: auto;
+}
+
+/* ---------- Type helpers ---------- */
+.kicker {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+}
+.serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.hand {
+  font-family: var(--font-hand);
+  font-weight: 600;
+}
+
+.section-head {
+  display: grid;
+  gap: 14px;
+  margin-bottom: clamp(32px, 5vw, 64px);
+}
+.section-head h2 {
+  font-size: var(--step-4);
+}
+.section-head p {
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: var(--step-1);
+}
+
+/* ---------- Buttons ----------
+   The <a>/<button> is a stationary hit target; only .btn__inner moves (magnetic effect). */
+.btn {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--ink);
+  --btn-border: rgb(20 17 13 / 0.14);
+  display: inline-flex;
+  min-height: 48px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font-weight: 650;
+  font-size: 1rem;
+  line-height: 1.1;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.btn__inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: inherit;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: inset 0 0 0 1.5px var(--btn-border), var(--shadow-1);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform 380ms var(--ease-out);
+}
+.btn .icon {
+  flex: none;
+  transition: transform var(--dur) var(--ease-out);
+}
+.btn__arrow {
+  display: inline-flex;
+}
+.btn--red {
+  --btn-bg: var(--red);
+  --btn-fg: #fff;
+  --btn-border: transparent;
+}
+.btn--ink {
+  --btn-bg: var(--ink);
+  --btn-fg: #fff;
+  --btn-border: transparent;
+}
+.btn--green {
+  --btn-bg: var(--green);
+  --btn-fg: #fff;
+  --btn-border: transparent;
+}
+.btn--ghost-light {
+  --btn-bg: transparent;
+  --btn-fg: #fff;
+  --btn-border: rgb(255 255 255 / 0.5);
+}
+.btn--small .btn__inner {
+  padding: 10px 18px;
+  font-size: 0.92rem;
+}
+.btn--small {
+  min-height: 44px;
+}
+.btn--lg {
+  min-height: 58px;
+}
+.btn--lg .btn__inner {
+  padding: 17px 28px;
+  font-size: 1.06rem;
+}
+@media (hover: hover) {
+  .btn--red:hover {
+    --btn-bg: var(--red-700);
+  }
+  .btn--ink:hover,
+  .btn--green:hover {
+    --btn-bg: var(--red);
+  }
+  .btn:not(.btn--red, .btn--ink, .btn--green, .btn--ghost-light):hover {
+    --btn-bg: var(--ink);
+    --btn-fg: #fff;
+    --btn-border: transparent;
+  }
+  .btn--ghost-light:hover {
+    --btn-bg: #fff;
+    --btn-fg: var(--green-900);
+  }
+  .btn:hover .btn__arrow .icon {
+    transform: translateX(4px);
+  }
+}
+.btn:active .btn__inner {
+  transform: scale(0.97);
+}
+
+/* Round arrow used in cards */
+.round-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+/* ---------- "To confirm" review markers (review builds only) ---------- */
+.tbc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: var(--radius-pill);
+  border: 1.5px dashed currentColor;
+  color: #8a5a00;
+  background: rgb(255 214 120 / 0.25);
+  white-space: nowrap;
+}
+.on-dark .tbc,
+.on-red .tbc {
+  color: #ffe08a;
+  background: rgb(0 0 0 / 0.18);
+}
+
+/* ---------- Pop-up boxes ----------
+   Every card/box lifts and "pops" toward the visitor on hover or keyboard focus.
+   Structure: .pop (stationary hit area) > .pop__body (moves). */
+.pop {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  isolation: isolate;
+}
+.pop__body {
+  position: relative;
+  height: 100%;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 460ms var(--ease-pop),
+    box-shadow 460ms var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+  will-change: auto;
+}
+.pop:is(:hover, :focus-visible, :focus-within) {
+  z-index: 3;
+}
+.pop:is(:hover, :focus-visible, :focus-within) .pop__body {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: var(--shadow-pop);
+}
+.pop:focus-visible {
+  outline: none;
+}
+.pop:focus-visible .pop__body {
+  outline: 3px solid var(--red);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pop:is(:hover, :focus-visible, :focus-within) .pop__body {
+    transform: none;
+  }
+}

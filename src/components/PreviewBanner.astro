@@ -1,0 +1,48 @@
+---
+/* Shown in review builds only (see src/data/site.ts). */
+---
+
+<aside class="preview-banner" aria-label="Draft notice">
+  <p>
+    <strong>Draft for shop approval.</strong>
+    <span>Food images are temporary concept art, not photos of this shop.</span>
+    <span class="tbc">To confirm</span>
+    <span>= awaiting the manager’s OK.</span>
+  </p>
+</aside>
+
+<style>
+  .preview-banner {
+    background: var(--ink);
+    color: #f6efe2;
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+  .preview-banner p {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+    padding: 8px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+  }
+  .preview-banner strong {
+    color: #fff;
+    margin-right: 4px;
+  }
+  @media (max-width: 600px) {
+    .preview-banner {
+      font-size: 0.72rem;
+    }
+    .preview-banner p {
+      padding: 6px 0;
+    }
+  }
+  .preview-banner .tbc {
+    color: #ffe08a;
+    background: rgb(255 255 255 / 0.06);
+    font-size: 0.62rem;
+    padding: 3px 6px;
+  }
+</style>

@@ -1,0 +1,12 @@
+---
+/** "To confirm" marker — rendered only in review builds for content that is not yet approved. */
+import { needsMarker, type ContentStatus } from '../data/site';
+
+interface Props {
+  status: ContentStatus;
+  label?: string;
+}
+const { status, label = 'To confirm' } = Astro.props;
+---
+
+{needsMarker(status) && <span class="tbc" title="Awaiting confirmation by the shop manager">{label}</span>}

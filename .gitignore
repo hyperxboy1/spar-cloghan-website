@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# build output (regenerate with `npm run build`)
+dist/
+.astro/
+
+# handover archives are produced by `npm run package`; only the upload-ready site ZIP is kept
+release/*
+!release/spar-cloghan-site.zip
+
+# environment & secrets — never commit
+.env
+.env.*
+!.env.example
+
+# logs & OS/editor files
+npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# QA output
+qa-output/

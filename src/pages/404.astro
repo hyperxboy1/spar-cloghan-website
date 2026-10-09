@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { business } from '../data/business';
+---
+
+<Base title="Page not found · SPAR Express Cloghan">
+  <section class="nf">
+    <p class="kicker">Page not found</p>
+    <h1 class="display nf__title">Wrong turn<span>.</span></h1>
+    <p class="nf__text">That page isn’t here. The shop is still on {business.address.street}, {business.address.town}.</p>
+    <div class="nf__actions">
+      <a class="btn btn--red" href="/"><span class="btn__inner">Back to the homepage <span class="btn__arrow"><Icon name="arrow" size={18} /></span></span></a>
+      <a class="btn" href={business.phone.href}><span class="btn__inner"><Icon name="phone" size={18} /> {business.phone.display}</span></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+    min-height: 60vh;
+    display: grid;
+    align-content: center;
+    gap: 18px;
+    padding-block: var(--section-y);
+  }
+  .nf__title {
+    font-size: clamp(4rem, 2rem + 9vw, 10rem);
+  }
+  .nf__title span {
+    color: var(--red);
+  }
+  .nf__text {
+    font-size: var(--step-1);
+    color: var(--muted);
+  }
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>

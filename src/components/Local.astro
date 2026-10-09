@@ -1,0 +1,235 @@
+---
+import Icon from './Icon.astro';
+import Tbc from './Tbc.astro';
+import { local } from '../data/local';
+import { isShown } from '../data/site';
+
+const facts = local.facts.filter((f) => isShown(f.status));
+const showHeading = isShown(local.headingStatus);
+const showBody = isShown(local.bodyStatus);
+const showAward = isShown(local.award.status);
+
+// Deterministic tree line for the decorative landscape (no image request).
+let seed = 7;
+const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const makeRow = (baseY: number, minR: number, spread: number, gap: number) => {
+  const row: Array<{ x: number; y: number; r: number }> = [];
+  for (let x = 6; x < 1440; x += gap + rand() * gap * 1.6) {
+    const cluster = rand() > 0.5 ? 3 : 2;
+    for (let c = 0; c < cluster; c++) row.push({ x: x + c * minR * 0.9, y: baseY - rand() * spread, r: minR + rand() * minR });
+  }
+  return row;
+};
+const farTrees = makeRow(132, 7, 10, 30);
+const trees = makeRow(152, 11, 16, 34);
+---
+
+{
+  (showHeading || showBody || facts.length > 0 || showAward) && (
+    <section class="local" id="local" aria-labelledby="local-title">
+      <div class="local__inner">
+        <div class="local__intro">
+          <p class="kicker">Our local shop</p>
+          <h2 id="local-title" class="local__title hand">
+            {showHeading ? local.heading : 'Our local shop'}
+            <Icon name="heart" size={40} class="local__heart" />
+          </h2>
+          {showHeading && <Tbc status={local.headingStatus} />}
+          {showBody && (
+            <p class="local__body">
+              {local.body} <Tbc status={local.bodyStatus} />
+            </p>
+          )}
+        </div>
+
+        <div class="local__side">
+          {facts.length > 0 && (
+            <ul class="local__facts" role="list">
+              {facts.map((f) => (
+                <li class="pop fact">
+                  <div class="pop__body fact__body">
+                    <span class="fact__icon">
+                      <Icon name={f.icon} size={26} />
+                    </span>
+                    <span class="fact__label">{f.label}</span>
+                    <Tbc status={f.status} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {showAward && (
+            <div class="pop award">
+              <div class="pop__body award__body">
+                <span class="award__year display">{local.award.year}</span>
+                <div>
+                  <p class="award__name serif">{local.award.name}</p>
+                  <p class="award__note">{local.award.note}</p>
+                  <Tbc status={local.award.status} />
+                </div>
+                <Icon name="award" size={44} class="award__icon" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div class="local__land" aria-hidden="true" data-reveal-land>
+        <svg viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax slice" role="presentation">
+          <circle cx="1130" cy="112" r="64" fill="var(--red)" opacity="0.9" />
+          <path d="M0 150C200 112 380 132 560 120S900 98 1100 122 1340 112 1440 126V220H0Z" fill="#c9d8c3" />
+          <g fill="#7fa78a">
+            {farTrees.map((t) => (
+              <circle cx={t.x.toFixed(1)} cy={t.y.toFixed(1)} r={t.r.toFixed(1)} />
+            ))}
+          </g>
+          <path d="M0 146C260 136 520 152 780 142S1220 134 1440 146V220H0Z" fill="#a9c3a6" />
+          <g fill="#1d6446">
+            {trees.map((t) => (
+              <circle cx={t.x.toFixed(1)} cy={t.y.toFixed(1)} r={t.r.toFixed(1)} />
+            ))}
+          </g>
+          <path d="M0 162C240 150 520 170 760 158S1180 148 1440 160V220H0Z" fill="#165c3f" />
+          <path d="M0 190C320 172 640 200 960 184S1300 180 1440 188V220H0Z" fill="var(--green-900)" />
+        </svg>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .local {
+    position: relative;
+    padding-top: var(--section-y);
+    background: linear-gradient(180deg, var(--cream) 0%, #f3e7d2 100%);
+  }
+  .local__inner {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .local__intro {
+    display: grid;
+    gap: 16px;
+    justify-items: start;
+  }
+  .local__title {
+    font-size: clamp(3rem, 2rem + 4vw, 6rem);
+    line-height: 0.9;
+    color: var(--ink);
+    transform: rotate(-3deg);
+    transform-origin: left bottom;
+    max-width: 12ch;
+  }
+  .local__title :global(.local__heart) {
+    display: inline-block;
+    vertical-align: top;
+    color: var(--red);
+    width: 0.6em;
+    height: 0.6em;
+    stroke-width: 2.2;
+  }
+  .local__body {
+    max-width: 46ch;
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+  .local__side {
+    display: grid;
+    gap: 16px;
+  }
+  .local__facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .fact__body {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    padding: 20px;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    box-shadow: var(--shadow-1);
+  }
+  .fact__icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+    color: var(--ink);
+    transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .fact:hover .fact__icon {
+    background: var(--red);
+    color: #fff;
+    box-shadow: none;
+  }
+  .fact__label {
+    font-weight: 650;
+    line-height: 1.25;
+  }
+  .award__body {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 22px 24px;
+    border-radius: var(--radius-m);
+    background: var(--ink);
+    color: #fff;
+    box-shadow: var(--shadow-2);
+  }
+  .award__year {
+    font-size: 3rem;
+    color: var(--glow);
+    line-height: 1;
+  }
+  .award__name {
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+  .award__note {
+    margin-top: 4px;
+    font-size: 0.86rem;
+    color: rgb(255 255 255 / 0.75);
+  }
+  .award :global(.tbc) {
+    margin-top: 8px;
+    color: #ffe08a;
+    background: rgb(255 255 255 / 0.06);
+  }
+  .award :global(.award__icon) {
+    color: var(--glow);
+  }
+  .local__land {
+    margin-top: clamp(48px, 7vw, 96px);
+    height: clamp(120px, 15vw, 220px);
+  }
+  .local__land svg {
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 860px) {
+    .local__inner {
+      grid-template-columns: 1fr;
+    }
+    .award__body {
+      grid-template-columns: auto 1fr;
+    }
+    .award :global(.award__icon) {
+      display: none;
+    }
+  }
+  @media (max-width: 380px) {
+    .local__facts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,344 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import Tbc from './Tbc.astro';
+import { useImage } from '../data/images';
+import { counter } from '../data/counter';
+import { services } from '../data/services';
+import { isShown } from '../data/site';
+
+const deliItem = counter.find((c) => c.id === 'deli');
+const coffeeItem = counter.find((c) => c.id === 'coffee');
+const visibleServices = services.filter((s) => isShown(s.status));
+
+const cards = [
+  deliItem &&
+    isShown(deliItem.status) && {
+      kicker: 'Deli',
+      title: 'Food to go',
+      text: 'From the deli counter — ask what’s on today.',
+      href: '#counter',
+      kind: 'photo' as const,
+      image: useImage('deliSandwich'),
+      status: deliItem.status,
+    },
+  coffeeItem &&
+    isShown(coffeeItem.status) && {
+      kicker: 'Coffee & bakery',
+      title: 'Coffee & something sweet',
+      text: 'A coffee for the road and treats from the counter.',
+      href: '#counter',
+      kind: 'photo' as const,
+      image: useImage('latte'),
+      status: coffeeItem.status,
+    },
+  {
+    kicker: 'Latest offers',
+    title: 'See what’s on offer',
+    text: 'Shop-approved offers, always with their dates.',
+    href: '#offers',
+    kind: 'offers' as const,
+    status: 'approved' as const,
+  },
+  {
+    kicker: 'Services',
+    title: 'Here when you need us',
+    text: visibleServices.length ? 'Forecourt and everyday services.' : 'Call the shop to check what’s available.',
+    href: '#services',
+    kind: 'services' as const,
+    status: visibleServices.length ? visibleServices[0].status : ('approved' as const),
+  },
+].filter(Boolean) as Array<{
+  kicker: string;
+  title: string;
+  text: string;
+  href: string;
+  kind: 'photo' | 'offers' | 'services';
+  image?: ReturnType<typeof useImage>;
+  status: 'approved' | 'review' | 'hidden';
+}>;
+---
+
+<section class="features" aria-labelledby="features-title">
+  <h2 id="features-title" class="visually-hidden">What’s in store</h2>
+  <ul class="features__grid" role="list">
+    {
+      cards.map((card, i) => (
+        <li class="features__item" style={`--i:${i}`}>
+          <a class="pop feature" href={card.href} data-tilt>
+            <div class="pop__body feature__body">
+              <div class="feature__tilt" data-tilt-target>
+                <span class="feature__sheen" data-tilt-sheen aria-hidden="true" />
+                <div class="feature__text">
+                  <p class="feature__kicker">
+                    {card.kicker}
+                    <Tbc status={card.status} />
+                  </p>
+                  <h3 class="feature__title serif">{card.title}</h3>
+                  <p class="feature__copy">{card.text}</p>
+                  <span class="round-arrow feature__arrow" aria-hidden="true">
+                    <Icon name="arrow" size={18} />
+                  </span>
+                </div>
+
+                {card.kind === 'photo' && card.image && (
+                  <div class="feature__media feature__media--photo">
+                    <Picture
+                      src={card.image.src}
+                      alt=""
+                      formats={['avif']}
+                      fallbackFormat="webp"
+                      widths={[200, 320, 440]}
+                      sizes="(max-width: 860px) 38vw, 12vw"
+                      quality={66}
+                      loading="lazy"
+                      decoding="async"
+                      style={`object-position:${card.image.focal.desktop}`}
+                    />
+                  </div>
+                )}
+
+                {card.kind === 'offers' && (
+                  <div class="feature__media feature__media--offers" aria-hidden="true">
+                    <span class="stamp">
+                      <span class="stamp__small">Latest</span>
+                      <span class="stamp__big">Offers</span>
+                      <span class="stamp__small">Check dates</span>
+                    </span>
+                  </div>
+                )}
+
+                {card.kind === 'services' && (
+                  <div class="feature__media feature__media--services" aria-hidden="true">
+                    <span><Icon name="fuel" size={26} /></span>
+                    <span><Icon name="atm" size={26} /></span>
+                    <span><Icon name="receipt" size={26} /></span>
+                    <span><Icon name="cup" size={26} /></span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .features {
+    position: relative;
+    z-index: 10;
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin: -64px auto 0;
+  }
+  .features__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 1.4vw, 20px);
+  }
+  .feature {
+    height: 100%;
+    border-radius: 22px;
+  }
+  .feature__body {
+    border-radius: 22px;
+    background: var(--paper);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px rgb(20 17 13 / 0.06);
+    perspective: 900px;
+  }
+  .feature__tilt {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: stretch;
+    gap: 10px;
+    height: 100%;
+    min-height: 196px;
+    padding: 22px 16px 20px 22px;
+    border-radius: inherit;
+    transform-style: preserve-3d;
+    transition: transform 380ms var(--ease-out);
+  }
+  .feature__sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+  .feature__sheen::before {
+    content: '';
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    left: -130px;
+    top: -130px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 236 180 / 0.55), transparent);
+  }
+  .feature__text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .feature__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .feature__kicker :global(.tbc) {
+    letter-spacing: 0.06em;
+    font-size: 0.58rem;
+    padding: 3px 6px;
+  }
+  .feature__title {
+    font-size: clamp(1.2rem, 1rem + 0.55vw, 1.55rem);
+    line-height: 1.08;
+  }
+  .feature__copy {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .feature__arrow {
+    margin-top: auto;
+    color: var(--ink);
+  }
+
+  /* Media: pops up out of the card on hover/focus */
+  .feature__media {
+    position: relative;
+    z-index: 2;
+    align-self: center;
+    border-radius: 16px;
+    transform: translateZ(0) rotate(2deg);
+    transition: transform 520ms var(--ease-pop), box-shadow 520ms var(--ease-out);
+  }
+  .feature__media--photo {
+    aspect-ratio: 0.82;
+    overflow: hidden;
+    box-shadow: var(--shadow-1), 0 0 0 4px #fff;
+    background: var(--cream-3);
+  }
+  .feature__media--photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 700ms var(--ease-out);
+  }
+  .feature__media--offers {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+  }
+  .stamp {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    width: 100%;
+    max-width: 136px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 0 0 5px var(--paper), 0 0 0 7px rgb(200 16 46 / 0.35), var(--shadow-2);
+    transform: rotate(-10deg);
+  }
+  .stamp__big {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+    line-height: 1;
+  }
+  .stamp__small {
+    font-family: var(--font-hand);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+  .feature__media--services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: var(--shadow-1);
+  }
+  .feature__media--services span {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    background: var(--cream);
+    color: var(--green);
+  }
+  .feature__media--services span:nth-child(2) {
+    background: var(--red);
+    color: #fff;
+  }
+  .feature__media--services span:nth-child(3) {
+    background: var(--green);
+    color: #fff;
+  }
+
+  .feature:is(:hover, :focus-visible) .feature__media {
+    transform: translate3d(0, -22px, 30px) rotate(-3deg) scale(1.07);
+  }
+  .feature:is(:hover, :focus-visible) .feature__media--photo {
+    box-shadow: var(--shadow-pop), 0 0 0 4px #fff;
+  }
+  .feature:is(:hover, :focus-visible) .feature__media--photo :global(img) {
+    transform: scale(1.03);
+  }
+  .feature:is(:hover, :focus-visible) .feature__arrow {
+    background: var(--red);
+    color: #fff;
+    box-shadow: none;
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 1180px) and (min-width: 861px) {
+    .features__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 860px) {
+    .features {
+      margin-top: 28px;
+    }
+    .features__grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .feature__tilt {
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr) 38%;
+      padding: 18px 14px 18px 18px;
+    }
+    .feature__media--offers .stamp {
+      max-width: 112px;
+    }
+    /* Touch feedback instead of hover */
+    .feature:active .pop__body {
+      transform: scale(0.985);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .feature:is(:hover, :focus-visible) .feature__media {
+      transform: rotate(2deg);
+    }
+  }
+</style>

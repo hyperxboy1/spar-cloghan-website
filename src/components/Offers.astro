@@ -1,0 +1,300 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { offers } from '../data/offers';
+import { useImage } from '../data/images';
+import { business } from '../data/business';
+import { dublinStartOfDay, dublinEndExclusive, formatDublinDate } from '../lib/dublin-time';
+
+/*
+ * Build-time filtering: only approved offers that have not ended. Offers that have not yet
+ * started are rendered `hidden` and revealed by the browser check once they begin. The browser
+ * check (src/scripts/offers.ts) also hides offers as soon as they expire.
+ */
+const buildTime = Date.now();
+const prepared = offers
+  .filter((o) => o.approved)
+  .map((o) => ({
+    ...o,
+    startMs: dublinStartOfDay(o.start),
+    endMs: dublinEndExclusive(o.end),
+    img: o.image ? useImage(o.image) : null,
+  }))
+  .filter((o) => o.endMs > buildTime)
+  .sort((a, b) => a.startMs - b.startMs);
+const liveAtBuild = prepared.filter((o) => o.startMs <= buildTime);
+---
+
+<section class="offers" id="offers" aria-labelledby="offers-title" data-offers>
+  <div class="offers__inner">
+    <header class="offers__head">
+      <p class="kicker">Latest offers</p>
+      <h2 id="offers-title" class="display offers__title">Offers, <span>straight from the shop.</span></h2>
+      <p class="offers__intro">Every offer here is approved by the shop and shows exactly when it runs.</p>
+    </header>
+
+    {
+      prepared.length > 0 && (
+        <ul class="offers__list" role="list" data-offers-list>
+          {prepared.map((o, i) => (
+            <li
+              class:list={['offers__item', { 'offers__item--lead': i === 0 }]}
+              data-offer
+              data-start={o.startMs}
+              data-end={o.endMs}
+              hidden={o.startMs > buildTime}
+            >
+              <article class="pop ticket">
+                <div class="pop__body ticket__body">
+                  {o.img && (
+                    <div class="ticket__media">
+                      <Picture
+                        src={o.img.src}
+                        alt={o.img.alt}
+                        formats={['avif']}
+                        fallbackFormat="webp"
+                        widths={[320, 520]}
+                        sizes="(max-width: 860px) 90vw, 30vw"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  )}
+                  <div class="ticket__main">
+                    <h3 class="ticket__title serif">{o.title}</h3>
+                    {o.description && <p class="ticket__desc">{o.description}</p>}
+                    {o.price && <p class="ticket__price display">{o.price}</p>}
+                  </div>
+                  <div class="ticket__stub">
+                    <p class="ticket__dates">
+                      <Icon name="clock" size={16} />
+                      {formatDublinDate(o.start)} – {formatDublinDate(o.end)}
+                    </p>
+                    <p class="ticket__terms">{o.terms}</p>
+                  </div>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <div class="offers__empty" data-offers-empty hidden={liveAtBuild.length > 0}>
+      <div class="pop ticket-empty">
+        <div class="pop__body ticket-empty__body">
+          <div class="ticket-empty__stub" aria-hidden="true">
+            <span class="display">Offers</span>
+          </div>
+          <div class="ticket-empty__main">
+            <p class="ticket-empty__stamp hand" aria-hidden="true">Watch this space</p>
+            <h3 class="ticket-empty__title serif">No offers are listed here right now.</h3>
+            <p>
+              When the shop approves an offer it appears here with its dates and terms. For today’s deals, check in with
+              the team on Facebook.
+            </p>
+            <div class="ticket-empty__actions">
+              <a class="btn btn--red" href={business.social.facebook.url} target="_blank" rel="noopener" data-magnetic>
+                <span class="btn__inner">
+                  <Icon name="facebook" size={18} />
+                  See our Facebook page
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </span>
+              </a>
+              <a class="btn" href={business.social.instagram.url} target="_blank" rel="noopener" data-magnetic>
+                <span class="btn__inner">
+                  <Icon name="instagram" size={18} />
+                  Instagram
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .offers {
+    padding-block: var(--section-y);
+  }
+  .offers__inner {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+  }
+  .offers__head {
+    display: grid;
+    gap: 14px;
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .offers__title {
+    font-size: clamp(2.8rem, 1.4rem + 4.8vw, 6.6rem);
+    line-height: 0.88;
+    max-width: 11.5em;
+  }
+  .offers__title span {
+    color: var(--red);
+  }
+  .offers__intro {
+    max-width: 50ch;
+    font-size: var(--step-1);
+    color: var(--muted);
+  }
+
+  /* ---------- Empty state: a deliberate ticket, not a blank grid ---------- */
+  .ticket-empty {
+    max-width: 1040px;
+  }
+  .ticket-empty__body {
+    --notch: 18px;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    border-radius: var(--radius-l);
+    background: var(--paper);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+    /* perforation notches */
+    mask:
+      radial-gradient(circle var(--notch) at 160px 0, #0000 98%, #000) top / 100% 51% no-repeat,
+      radial-gradient(circle var(--notch) at 160px 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+  }
+  .ticket-empty__stub {
+    position: relative;
+    display: grid;
+    place-items: center;
+    background: var(--red);
+    color: #fff;
+    border-right: 3px dashed rgb(255 250 241 / 0.9);
+  }
+  .ticket-empty__stub span {
+    font-size: 4.6rem;
+    line-height: 1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    letter-spacing: 0.02em;
+  }
+  .ticket-empty__main {
+    position: relative;
+    padding: clamp(28px, 4vw, 52px);
+    display: grid;
+    gap: 14px;
+    align-content: center;
+  }
+  .ticket-empty__main > p:not(.ticket-empty__stamp) {
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: var(--step-1);
+  }
+  .ticket-empty__stamp {
+    position: absolute;
+    top: 22px;
+    right: 26px;
+    padding: 4px 14px 6px;
+    border: 2.5px solid var(--green);
+    border-radius: 10px;
+    color: var(--green);
+    font-size: 1.5rem;
+    line-height: 1;
+    transform: rotate(6deg);
+    opacity: 0.85;
+  }
+  .ticket-empty__title {
+    font-size: var(--step-3);
+    line-height: 1.08;
+    max-width: 18ch;
+  }
+  .ticket-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  /* ---------- Offer tickets ---------- */
+  .offers__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .offers__item--lead {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .ticket__body {
+    display: grid;
+    height: 100%;
+    border-radius: var(--radius-l);
+    background: var(--paper);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+  }
+  .ticket__media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .ticket__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ticket__main {
+    padding: 24px 24px 18px;
+    display: grid;
+    gap: 8px;
+  }
+  .ticket__title {
+    font-size: var(--step-2);
+  }
+  .ticket__desc {
+    color: var(--muted);
+  }
+  .ticket__price {
+    font-size: clamp(2.6rem, 2rem + 2vw, 4rem);
+    color: var(--red);
+  }
+  .ticket__stub {
+    margin-top: auto;
+    padding: 16px 24px 20px;
+    border-top: 2px dashed var(--line);
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .ticket__dates {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    .offers__list {
+      grid-template-columns: 1fr;
+    }
+    .offers__item--lead {
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .ticket-empty__body {
+      grid-template-columns: 1fr;
+      mask: none;
+    }
+    .ticket-empty__stub {
+      border-right: 0;
+      border-bottom: 3px dashed rgb(255 250 241 / 0.9);
+      padding-block: 14px;
+    }
+    .ticket-empty__stub span {
+      writing-mode: horizontal-tb;
+      transform: none;
+      font-size: 2.6rem;
+    }
+    .ticket-empty__stamp {
+      position: static;
+      justify-self: start;
+      font-size: 1.25rem;
+    }
+  }
+</style>

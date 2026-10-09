@@ -1,0 +1,33 @@
+{
+  "name": "spar-cloghan-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Promotional static website draft for SPAR Express Cloghan (Healy's SPAR), Hill Street, Cloghan, Co. Offaly.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:launch": "node scripts/build-launch.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test:e2e": "node scripts/qa.mjs",
+    "package": "node scripts/package-zip.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource/anton": "5.3.0",
+    "@fontsource/caveat": "5.3.0",
+    "@fontsource/fraunces": "5.3.0",
+    "astro": "7.3.8",
+    "gsap": "3.15.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "22.20.5",
+    "playwright": "1.56.1",
+    "typescript": "6.0.3"
+  }
+}

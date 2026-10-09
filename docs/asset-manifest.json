@@ -1,0 +1,100 @@
+{
+  "updated": "2026-10-09",
+  "note": "Every image, font and graphic used by the site, plus every candidate source inspected. No asset was downloaded from Facebook, Instagram, Google or any other third-party site. All current food images are placeholders and are NOT photographs of this shop.",
+  "images": [
+    {
+      "id": "REF-01",
+      "localFile": "docs/design-reference/reference-mockup.webp",
+      "subject": "Website design mockup (browser frame) showing a SPAR Cloghan homepage concept",
+      "sourcePage": "Supplied by the client in the build request (chat attachment), 9 Oct 2026",
+      "originalAssetUrl": null,
+      "date": "2026-10-09 (received)",
+      "dimensions": "1448x1086",
+      "creator": "Unknown — appears AI-generated; supplied by the client",
+      "permission": "Client-supplied for this project and explicitly requested to be used as the reference. Not cleared for publication as a photograph of the shop.",
+      "placement": "Design reference only. Not shipped in the build. Source of the three placeholder crops below.",
+      "placeholder": true,
+      "approved": false
+    },
+    {
+      "id": "IMG-01",
+      "localFile": "src/assets/images/baguette-cutout.png",
+      "subject": "Seeded baguette with ham, cheese, tomato and lettuce — transparent cut-out",
+      "sourcePage": "REF-01, crop x575–1050, y300–605 (475x305 px)",
+      "originalAssetUrl": null,
+      "date": "2026-10-09 (processed)",
+      "dimensions": "1802x1129 RGBA",
+      "processing": "4x upscale (OpenCV dnn_superres EDSR x4), background removal (rembg, isnet-general-use), largest-component alpha cleanup, light edge choke, mild unsharp mask. The printed slogan on the wrapping paper and the SPAR-branded cup behind were excluded.",
+      "permission": "Derived from client-supplied REF-01. AI-generated concept art — not a product of this shop.",
+      "placement": "Hero foreground (desktop + mobile)",
+      "focalPoints": { "desktop": "50% 50%", "mobile": "50% 50%" },
+      "placeholder": true,
+      "approved": false
+    },
+    {
+      "id": "IMG-02",
+      "localFile": "src/assets/images/latte-croissant.jpg",
+      "subject": "Latte with leaf foam art, croissant behind",
+      "sourcePage": "REF-01, crop x540–718, y606–791 (178x185 px)",
+      "originalAssetUrl": null,
+      "date": "2026-10-09 (processed)",
+      "dimensions": "662x720",
+      "processing": "4x upscale (EDSR x4); a fabricated logo printed on the cup was removed by inpainting so no fake branding appears; edge text and card corner cropped; mild unsharp mask.",
+      "permission": "Derived from client-supplied REF-01. AI-generated concept art.",
+      "placement": "Hero mid-ground plane (with sheen), Coffee & bakery card, Counter showcase 'Coffee'",
+      "focalPoints": { "desktop": "50% 62%", "mobile": "50% 58%" },
+      "placeholder": true,
+      "approved": false
+    },
+    {
+      "id": "IMG-03",
+      "localFile": "src/assets/images/deli-sandwich.jpg",
+      "subject": "Tall sandwich on seeded bread with ham, tomato and lettuce",
+      "sourcePage": "REF-01, crop x196–373, y606–791 (177x185 px)",
+      "originalAssetUrl": null,
+      "date": "2026-10-09 (processed)",
+      "dimensions": "684x722",
+      "processing": "4x upscale (EDSR x4); card edges cropped; mild unsharp mask. Visibly soft at large sizes — replace with an original photograph.",
+      "permission": "Derived from client-supplied REF-01. AI-generated concept art.",
+      "placement": "Hero mid-ground plane (desktop ≥1101 px), Deli card, Counter showcase 'Deli'",
+      "focalPoints": { "desktop": "50% 50%", "mobile": "50% 45%" },
+      "placeholder": true,
+      "approved": false
+    }
+  ],
+  "rejectedFromReference": [
+    { "subject": "SPAR-branded takeaway cup ('More Than Just a Coffee')", "reason": "Fabricated product branding" },
+    { "subject": "Storefront with 'Healy's SPAR Cloghan' signage and chalkboard", "reason": "Fabricated signage; would misrepresent the real shop" },
+    { "subject": "Coca-Cola / Walkers products in the offers card", "reason": "Third-party trademarks; implies offers that do not exist" },
+    { "subject": "National Lottery / payzone / ATM logos", "reason": "Third-party trademarks; services unconfirmed" },
+    { "subject": "Church and village panorama ('Proud to be part of Cloghan')", "reason": "Generated scene presented as Cloghan — misleading; replaced by an abstract illustrated landscape" },
+    { "subject": "Berry-topped pastry", "reason": "Obstructed by a blurred foreground leaf; clean extraction failed" },
+    { "subject": "'Good Food Brighter Days' slogan", "reason": "Unverified slogan; not used" }
+  ],
+  "ownGraphics": [
+    { "file": "src/components/Icon.astro", "subject": "Line icon set", "creator": "Drawn for this project", "permission": "Project-owned" },
+    { "file": "src/components/Local.astro", "subject": "Illustrated countryside band (SVG, generated at build)", "creator": "Drawn for this project", "permission": "Project-owned; abstract, depicts no real place" },
+    { "file": "src/components/Hero.astro", "subject": "Circular 'Hill Street • Cloghan • Co. Offaly' badge (SVG)", "creator": "Drawn for this project", "permission": "Project-owned" },
+    { "file": "public/favicon.svg", "subject": "Red square with heart", "creator": "Drawn for this project", "permission": "Project-owned; temporary" },
+    { "file": "src/components/Wordmark.astro", "subject": "Temporary text treatment in place of the SPAR logo", "creator": "Typography only", "permission": "Temporary — replace with approved logo" }
+  ],
+  "fonts": [
+    { "family": "Anton", "file": "src/assets/fonts/anton-latin-400-normal.woff2", "licence": "SIL OFL 1.1", "source": "npm @fontsource/anton 5.3.0" },
+    { "family": "Inter (variable)", "file": "src/assets/fonts/inter-latin-wght-normal.woff2", "licence": "SIL OFL 1.1", "source": "npm @fontsource-variable/inter 5.3.0" },
+    { "family": "Fraunces 600", "file": "src/assets/fonts/fraunces-latin-600-normal.woff2", "licence": "SIL OFL 1.1", "source": "npm @fontsource/fraunces 5.3.0" },
+    { "family": "Caveat 600", "file": "src/assets/fonts/caveat-latin-600-normal.woff2", "licence": "SIL OFL 1.1", "source": "npm @fontsource/caveat 5.3.0" }
+  ],
+  "candidateSourcesInspected": [
+    { "url": "https://www.spar.ie/store-locator/", "result": "Not reachable from the build environment (network policy). Nothing downloaded." },
+    { "url": "https://stations.maxol.ie/offaly/cloghan/healys-spar-express", "result": "Not reachable from the build environment. Nothing downloaded." },
+    { "url": "https://www.facebook.com/sparcloghan/", "result": "Not reachable; Facebook also restricted gallery access during earlier research. No images taken. Do not hotlink Facebook CDN images." },
+    { "url": "https://www.facebook.com/sparcloghan/photos/", "result": "Not reachable. Needs the shop's own originals." },
+    { "url": "https://www.facebook.com/sparcloghan/photos/1570474428414524/", "result": "Store photo lead — content not inspected (not reachable)." },
+    { "url": "https://www.facebook.com/sparcloghan/posts/take-the-hassle-out-of-christmas-dessert-prep-and-order-a-freshly-made-dessert-i/1469521498509818/", "result": "Bakery/dessert lead — not reachable; used only as a reason to include a 'Bakery' block (to confirm)." },
+    { "url": "https://www.facebook.com/sparcloghan/videos/catering-finger-food-going-outtaking-catering-ordersjust-pm-us-or-give-us-a-call/1465344337672921/", "result": "Catering lead — not reachable; catering block built but hidden." },
+    { "url": "https://m.facebook.com/sparcloghan/photos/breakfast-from-6am-mon-to-sat-and-7am-on-sunday-/1110508161077822/", "result": "Breakfast lead — headline hours NOT used as a timetable." },
+    { "url": "https://www.instagram.com/sparcloghan/", "result": "Not reachable. No images taken." },
+    { "url": "https://www.offalyindependent.ie/2024/07/03/four-offaly-spar-stores-receive-retail-excellence-accolades/", "result": "Not reachable. Award text kept dated; group photograph must not be used." },
+    { "url": "https://www.google.com/maps/search/?api=1&query=SPAR+Express+Cloghan+Hill+Street+R42+R856", "result": "Used only as an external directions link; destination not verified. No screenshots." }
+  ]
+}

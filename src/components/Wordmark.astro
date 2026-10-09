@@ -1,0 +1,96 @@
+---
+/**
+ * TEMPORARY text treatment — NOT the official SPAR logo.
+ * The approved SPAR logo artwork was not available, and an unofficial tree mark must not be
+ * manufactured. Replace this component's contents with the approved logo file (kept
+ * undistorted, with its clear space) once the shop supplies it. Listed in docs/APPROVALS-CHECKLIST.md.
+ */
+interface Props {
+  tone?: 'light' | 'dark';
+}
+const { tone = 'light' } = Astro.props;
+---
+
+<a class:list={['wordmark', `wordmark--${tone}`]} href="#top" data-temporary-logo>
+  <span class="wordmark__spar">SPAR <span>Express</span></span>
+  <span class="wordmark__local">
+    <span class="wordmark__healys">Healy’s</span>
+    <span class="wordmark__town">Cloghan</span>
+  </span>
+  <span class="visually-hidden">— back to top</span>
+</a>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 44px;
+    text-decoration: none;
+    color: var(--ink);
+    flex: none;
+  }
+  .wordmark__spar {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--red);
+    padding-right: 14px;
+    border-right: 1.5px solid var(--line);
+  }
+  .wordmark__spar span {
+    color: var(--green);
+  }
+  .wordmark__local {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1;
+  }
+  .wordmark__healys {
+    font-family: var(--font-hand);
+    font-weight: 600;
+    font-size: 1.75rem;
+    color: var(--ink);
+    transform: rotate(-4deg) translateY(1px);
+  }
+  .wordmark__town {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+  }
+  .wordmark--dark {
+    color: #fff;
+  }
+  .wordmark--dark .wordmark__spar {
+    color: #fff;
+    border-color: rgb(255 255 255 / 0.25);
+  }
+  .wordmark--dark .wordmark__spar span {
+    color: #9fd8b8;
+  }
+  .wordmark--dark .wordmark__healys {
+    color: #fff;
+  }
+  @media (max-width: 860px) {
+    .wordmark {
+      gap: 9px;
+    }
+    .wordmark__spar {
+      font-size: 1.2rem;
+      padding-right: 9px;
+    }
+    .wordmark__healys {
+      font-size: 1.4rem;
+    }
+    .wordmark__town {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 350px) {
+    .wordmark__town {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+import Icon from './Icon.astro';
+import { business } from '../data/business';
+---
+
+<!-- Small-screen shortcut bar. Body padding (--dock-h) keeps it from covering content;
+     safe-area insets keep it clear of the home indicator. -->
+<nav class="dock" aria-label="Quick contact">
+  <a class="dock__btn dock__btn--call" href={business.phone.href}>
+    <Icon name="phone" size={20} />
+    <span>Call the shop</span>
+  </a>
+  <a class="dock__btn" href={business.directionsUrl} target="_blank" rel="noopener">
+    <Icon name="pin" size={20} />
+    <span>Directions<span class="visually-hidden"> (opens Google Maps in a new tab)</span></span>
+  </a>
+  <a class="dock__btn" href="#visit">
+    <Icon name="clock" size={20} />
+    <span>Visit us</span>
+  </a>
+</nav>
+
+<style>
+  .dock {
+    display: none;
+  }
+  @media (max-width: 860px) {
+    .dock {
+      position: fixed;
+      z-index: 45;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr 1fr;
+      gap: 8px;
+      padding: 8px max(10px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
+      background: rgb(255 250 241 / 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -12px 30px -20px rgb(40 20 10 / 0.35);
+    }
+    .dock__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 48px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 650;
+      text-decoration: none;
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1.5px var(--line);
+      background: var(--paper);
+      transition: transform 160ms var(--ease-out);
+    }
+    .dock__btn :global(.icon) {
+      color: var(--red);
+      flex: none;
+    }
+    .dock__btn--call {
+      background: var(--red);
+      color: #fff;
+      box-shadow: none;
+    }
+    .dock__btn--call :global(.icon) {
+      color: #fff;
+    }
+    .dock__btn:active {
+      transform: scale(0.96);
+    }
+    :global(html.menu-open) .dock {
+      visibility: hidden;
+    }
+  }
+  @media (max-width: 360px) {
+    .dock__btn {
+      font-size: 0.8rem;
+      gap: 5px;
+    }
+  }
+</style>
