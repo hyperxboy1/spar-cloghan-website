@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
-import { offers } from '../data/offers';
+import { offers, featuredOffers } from '../data/offers';
 import { useImage } from '../data/images';
 import { business } from '../data/business';
 import { dublinStartOfDay, dublinEndExclusive, formatDublinDate } from '../lib/dublin-time';
@@ -23,8 +23,10 @@ const prepared = offers
   .filter((o) => o.endMs > buildTime)
   .sort((a, b) => a.startMs - b.startMs);
 const liveAtBuild = prepared.filter((o) => o.startMs <= buildTime);
+const hasFeatured = featuredOffers.some((o) => o.approved);
 ---
 
+{(prepared.length > 0 || !hasFeatured) && (
 <section class="offers" id="offers" aria-labelledby="offers-title" data-offers>
   <div class="offers__inner">
     <header class="offers__head">
@@ -115,6 +117,7 @@ const liveAtBuild = prepared.filter((o) => o.startMs <= buildTime);
     </div>
   </div>
 </section>
+)}
 
 <style>
   .offers {

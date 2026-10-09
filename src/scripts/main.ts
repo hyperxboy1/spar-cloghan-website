@@ -43,6 +43,9 @@ export function boot() {
   cleanups.push(initMenu());
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   if (hero) cleanups.push(initHeroStage(hero));
+  // The Special Offers banner reuses the same controller for its restrained background depth.
+  const offersHero = document.querySelector<HTMLElement>('[data-offers-hero]');
+  if (offersHero) cleanups.push(initHeroStage(offersHero));
   cleanups.push(initMagnetic(), initTilt(), initCounter(), initOffers());
 
   whenIdle(() => void syncScrollScenes());

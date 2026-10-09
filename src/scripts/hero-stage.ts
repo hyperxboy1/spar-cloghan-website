@@ -164,6 +164,7 @@ export function initHeroStage(hero: HTMLElement): Cleanup {
   /** Return everything to rest immediately (used when nobody can see the motion). */
   const restNow = () => {
     stop();
+    if (!enabled) return; // static composition: leave CSS in charge, write nothing
     for (const s of springs) s.snap(0, 0);
     setLit(false);
     hero.classList.remove('is-over-control');

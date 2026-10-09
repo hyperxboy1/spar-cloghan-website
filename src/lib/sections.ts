@@ -22,7 +22,7 @@ export const exploreHref = sections.counter ? '#counter' : '#services';
 
 export const navLinks = [
   sections.counter && { href: '#counter', label: 'Deli & coffee' },
-  { href: '#offers', label: 'Offers' },
+  { href: '#special-offers', label: 'Offers' },
   { href: '#services', label: 'Services' },
   sections.local && { href: '#local', label: 'Our shop' },
 ].filter(Boolean) as Array<{ href: string; label: string }>;

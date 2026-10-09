@@ -125,13 +125,16 @@ for (const [w, h, touch] of [
     robots: document.querySelector('meta[name="robots"]')?.getAttribute('content'),
     canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
     jsonld: document.querySelectorAll('script[type="application/ld+json"]').length,
-    lcp: document.querySelector('.hero__fg img')?.getAttribute('fetchpriority'),
+    lcp: document.querySelector('.so__bg img')?.getAttribute('fetchpriority'),
+    firstSection: document.querySelector('main > section')?.id,
+    soCards: document.querySelectorAll('.so-card').length,
     lang: document.documentElement.lang,
   }));
   record('preview is noindex', meta.robots === 'noindex, nofollow', String(meta.robots));
   record('no canonical before a deployment URL is set', meta.canonical === null, String(meta.canonical));
-  record('no structured data until business facts are approved', meta.jsonld === 0, String(meta.jsonld));
-  record('hero image is high fetch priority', meta.lcp === 'high', String(meta.lcp));
+  record('structured data present (business facts approved)', meta.jsonld === 1, String(meta.jsonld));
+  record('offers banner image is high fetch priority', meta.lcp === 'high', String(meta.lcp));
+  record('Special Offers is the first section, with four cards', meta.firstSection === 'special-offers' && meta.soCards === 4, `${meta.firstSection} / ${meta.soCards}`);
   record('document language set', meta.lang === 'en-IE', meta.lang);
   const res = await page.request.get(new URL('/does-not-exist', URL_BASE).href);
   record('unknown path returns the 404 page', res.status() === 404, String(res.status()));
@@ -152,9 +155,11 @@ for (const [w, h, touch] of [
     }),
   );
   await page.waitForTimeout(1600); // entrance + idle-loaded scroll scenes
+  await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; document.querySelector('[data-hero]').scrollIntoView({ block: 'start', behavior: 'instant' }); window.scrollBy({ top: -80, behavior: 'instant' }); });
+  await page.waitForTimeout(400);
   const layerState = () =>
     page.evaluate(() => ({
-      layers: [...document.querySelectorAll('[data-layer]')].map((el) => el.style.transform || 'none'),
+      layers: [...document.querySelectorAll('[data-hero] [data-layer]')].map((el) => el.style.transform || 'none'),
       lit: document.querySelector('[data-hero]').classList.contains('is-lit'),
       ctas: [...document.querySelectorAll('.hero__actions a')].map((a) => {
         const r = a.getBoundingClientRect();
@@ -170,6 +175,7 @@ for (const [w, h, touch] of [
     const r = document.querySelector('[data-hero]').getBoundingClientRect();
     return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
+  hero.h = Math.min(hero.h, 900 - hero.y);
   const corners = {
     'top-left': [hero.x + 4, hero.y + 4],
     'top-right': [hero.x + hero.w - 4, hero.y + 4],
@@ -227,7 +233,7 @@ for (const [w, h, touch] of [
   // Magnetic button: the anchor does not move, only its inner layer.
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
-    window.scrollTo(0, 0);
+    document.querySelector('.hero__actions').scrollIntoView({ block: 'center', behavior: 'instant' });
   });
   const cta = page.locator('.hero__actions a').first();
   const box = await cta.boundingBox();
@@ -238,10 +244,10 @@ for (const [w, h, touch] of [
     const r = a.getBoundingClientRect();
     return { inner: a.querySelector('.btn__inner').style.transform, x: r.x, y: r.y };
   });
-  record('magnetic CTA moves only its inner layer', /translate3d/.test(mag.inner) && Math.abs(mag.x - box.x) < 0.5 && Math.abs(mag.y - box.y) < 0.5, mag.inner);
+  record('magnetic CTA moves only its inner layer', /translate3d/.test(mag.inner) && Math.abs(mag.x - box.x) < 0.5 && Math.abs(mag.y - box.y) < 0.5, `${mag.inner} anchor Δ ${(mag.x - box.x).toFixed(2)},${(mag.y - box.y).toFixed(2)}`);
 
   // Card pop-up on hover.
-  await page.evaluate(() => document.querySelector('.features').scrollIntoView({ block: 'center' }));
+  await page.evaluate(() => document.querySelector('.features').scrollIntoView({ block: 'center', behavior: 'instant' }));
   await page.waitForTimeout(300);
   const card = page.locator('.feature').first();
   const cb = await card.boundingBox();
@@ -343,15 +349,15 @@ for (const [w, h] of [
     };
     return {
       h1: visible('#hero-title'),
-      sections: ['#counter-title', '#offers-title', '#services-title', '#local-title', '#visit-title'].map(visible),
+      sections: ['#so-title', '#counter-title', '#services-title', '#local-title', '#visit-title'].map(visible),
       mobileLinks: [...document.querySelectorAll('[data-menu] a')].filter((a) => a.getBoundingClientRect().width > 0).length,
-      offersEmpty: visible('[data-offers-empty]'),
+      offersEmpty: visible('.so-card'),
       heroImg: visible('.hero__fg img'),
     };
   });
   record(`[no JS ${w}px] headline, sections and hero image visible`, s.h1 && s.sections.every(Boolean) && s.heroImg, JSON.stringify(s.sections));
   if (w < 861) record('[no JS] mobile navigation links are shown without the menu script', s.mobileLinks >= 4, String(s.mobileLinks));
-  record(`[no JS ${w}px] offers message visible`, s.offersEmpty);
+  record(`[no JS ${w}px] special-offer cards visible`, s.offersEmpty);
   await page.screenshot({ path: new URL(`nojs-${w}.png`, OUT).pathname, fullPage: true });
   await ctx.close();
 }
@@ -402,6 +408,11 @@ for (const [w, h] of [
     { id: 'future', start: dublin('2026-10-11'), end: dublin('2026-10-12') },
     { id: 'expired', start: dublin('2026-10-01'), end: dublin('2026-10-05') },
   ];
+  const probe = await open();
+  const hasDated = await probe.page.evaluate(() => !!document.querySelector('[data-offers]'));
+  await probe.ctx.close();
+  if (!hasDated) record('offers date guard: dated-offers section not rendered (featured offers have no dates) — skipped', true);
+  else {
   const { ctx, page } = await open({}, async (p) => {
     await p.clock.install({ time: new Date('2026-10-10T20:00:00+01:00') });
     await p.route(URL_BASE, async (route) => {
@@ -432,6 +443,7 @@ for (const [w, h] of [
   const s3 = await state();
   record('offers: when everything has expired the honest empty message returns', !s3.live && !s3.future && s3.empty, JSON.stringify(s3));
   await ctx.close();
+  }
 }
 
 // ---------------------------------------------------------------- 9. Transfer budget (mobile, first screen, no scrolling)

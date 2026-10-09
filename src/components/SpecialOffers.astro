@@ -1,0 +1,565 @@
+---
+/**
+ * “SPECIAL OFFERS” poster section — the first section under the navigation.
+ * Recreates the shop's promotional poster in real HTML/CSS: selectable text, editable prices
+ * (src/data/offers.ts → featuredOffers) and real product photographs (src/assets/offers/).
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { featuredOffers } from '../data/offers';
+import { SITE_MODE } from '../data/site';
+import aisle from '../assets/offers/aisle-background.jpg';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/offers/*.{png,jpg,jpeg,webp,avif}', { eager: true });
+const byName = new Map(
+  Object.entries(files).map(([path, mod]) => [path.split('/').pop()!.replace(/\.[^.]+$/, ''), mod.default]),
+);
+
+const offers = featuredOffers
+  .filter((o) => o.approved)
+  .map((o) => ({
+    ...o,
+    shots: o.images.map((img) => ({ ...img, src: byName.get(img.file) ?? null })),
+  }));
+
+const missing = offers.flatMap((o) => o.shots.filter((s) => !s.src).map((s) => `${s.file} (${o.name})`));
+if (SITE_MODE === 'launch' && missing.length) {
+  throw new Error(`[launch build] Product photographs missing in src/assets/offers/: ${missing.join(', ')}`);
+}
+---
+
+<section class="so" id="special-offers" aria-labelledby="so-title" data-offers-hero>
+  <div class="so__banner">
+    <div class="so__bg" data-layer data-depth="-7" data-spring="bg" aria-hidden="true">
+      <Image src={aisle} alt="" widths={[800, 1400, 2000]} sizes="100vw" quality={70} loading="eager" fetchpriority="high" />
+    </div>
+    <div class="so__shade" aria-hidden="true"></div>
+
+    <div class="so__brand">
+      <!-- Temporary text treatment: replace with the approved SPAR logo artwork (no tree mark drawn). -->
+      <span class="so__spar" data-temporary-logo>SPAR</span>
+      <span class="so__store">Healy’s SPAR Cloghan</span>
+    </div>
+
+    <p class="so__script" aria-hidden="true">Local<br />People<br />Local Value</p>
+
+    <div class="so__head">
+      <h1 id="so-title" class="so__title">Special Offers</h1>
+      <p class="so__sub">
+        <span>Great brands</span><i aria-hidden="true"></i><span>Great value</span><i aria-hidden="true"></i><span>Right here in Cloghan</span>
+      </p>
+    </div>
+
+    <svg class="so__wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 22 C 380 58, 1060 58, 1440 22 L1440 70 L0 70 Z" fill="#0a5a33"></path>
+      <path d="M0 30 C 380 66, 1060 66, 1440 30 L1440 70 L0 70 Z" fill="#d7141a"></path>
+      <path d="M0 40 C 380 76, 1060 76, 1440 40 L1440 70 L0 70 Z" fill="#fff"></path>
+    </svg>
+  </div>
+
+  <ul class="so__cards" role="list">
+    {
+      offers.map((o, i) => (
+        <li class="so-card" style={`--i:${i}`}>
+          <p class="so-card__badge">
+            <span class="so-card__top">{o.badgeTop}</span>
+            <span class="so-card__price">{o.badgePrice}</span>
+            {o.badgeNote && <span class="so-card__note">{o.badgeNote}</span>}
+          </p>
+          <div class:list={['so-card__media', `so-card__media--${o.shots.every((x) => x.src) ? o.layout : 'single'}`]}>
+            {o.shots.every((x) => x.src) ? (
+              o.shots.map((s, k) => (
+                <Image
+                  src={s.src!}
+                  alt={s.alt}
+                  widths={[260, 400, 560]}
+                  sizes="(max-width: 640px) 70vw, (max-width: 1100px) 36vw, 18vw"
+                  quality={78}
+                  class={`so-card__img so-card__img--${k}`}
+                  loading="eager"
+                />
+              ))
+            ) : (
+              <span class="so-card__img so-card__img--0 so-card__missing">
+                <b>{o.shots.length > 1 ? `${o.shots.length} product photos needed` : 'Product photo needed'}</b>
+                {o.shots.map((s) => (
+                  <small>{s.alt}</small>
+                ))}
+                <code>src/assets/offers/</code>
+              </span>
+            )}
+          </div>
+          <h2 class="so-card__name">
+            {o.name}
+            <span>{o.detail}</span>
+          </h2>
+          <p class="so-card__regular">
+            Regular price <strong>{o.regular}</strong>
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="so__strip">
+    <p class="so__slogan">Proud to be part of your local community</p>
+    <p class="so__there">
+      <span class="so__spar so__spar--small">SPAR</span>
+      <span class="so__there-text">There for you</span>
+    </p>
+    <p class="so__small">Offers subject to availability.</p>
+  </div>
+</section>
+
+<style>
+  @font-face {
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/montserrat-latin-800-normal.woff2') format('woff2');
+    font-weight: 800;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/montserrat-latin-900-normal.woff2') format('woff2');
+    font-weight: 900;
+    font-display: swap;
+  }
+  .so {
+    --so-red: #d7141a;
+    --so-green: #0a5a33;
+    --so-yellow: #ffe500;
+    --so-font: 'Montserrat', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    background: #fff;
+    color: #111;
+  }
+
+  /* ---------- Banner ---------- */
+  .so__banner {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    height: clamp(300px, 25.7vw, 440px);
+    color: #fff;
+  }
+  .so__bg {
+    position: absolute;
+    inset: -24px;
+    z-index: -2;
+  }
+  .so__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .so__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(90deg, rgb(30 18 10 / 0.38) 0%, rgb(30 18 10 / 0.1) 55%, rgb(30 18 10 / 0) 100%),
+      linear-gradient(180deg, rgb(0 0 0 / 0.05) 40%, rgb(0 0 0 / 0.25) 85%);
+  }
+  .so__brand {
+    position: absolute;
+    left: 3.6%;
+    top: 13%;
+    display: grid;
+    gap: 4px;
+    padding: 9px 12px 10px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.25);
+  }
+  .so__spar {
+    display: inline-block;
+    padding: 4px 22px 3px;
+    background: var(--so-red);
+    color: #fff;
+    font: 900 clamp(1.4rem, 2.9vw, 2.6rem) / 1 var(--so-font);
+    letter-spacing: 0.16em;
+    text-align: center;
+  }
+  .so__store {
+    color: var(--so-green);
+    font: 800 clamp(0.9rem, 1.9vw, 1.75rem) / 1.1 var(--so-font);
+    letter-spacing: -0.01em;
+  }
+  .so__script {
+    position: absolute;
+    right: 9%;
+    top: 7%;
+    font: 600 clamp(1.4rem, 3.3vw, 3rem) / 0.9 var(--font-hand);
+    transform: rotate(-12deg);
+    text-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+  }
+  .so__script::after {
+    content: '';
+    display: block;
+    width: 70%;
+    height: 4px;
+    margin: 10px 0 0 22%;
+    border-radius: 4px;
+    background: var(--so-red);
+    transform: rotate(-4deg);
+  }
+  .so__head {
+    position: absolute;
+    left: 4.6%;
+    right: 4%;
+    top: 52%;
+    transform: translateY(-50%);
+    margin-top: 4%;
+  }
+  .so__title {
+    font: 900 clamp(2.6rem, 6.9vw, 6.6rem) / 0.95 var(--so-font);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    text-shadow: 0 4px 18px rgb(0 0 0 / 0.35);
+    animation: so-title 900ms var(--ease-out) both;
+  }
+  .so__sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em 1.4em;
+    justify-content: center;
+    max-width: 72em;
+    margin: 0.9em 0 0;
+    font: 700 clamp(0.62rem, 1.32vw, 1.25rem) / 1 var(--font-sans);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+  }
+  .so__sub i {
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: var(--so-red);
+  }
+  .so__wave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 13%;
+  }
+
+  /* ---------- Cards ---------- */
+  .so__cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(8px, 0.9vw, 14px);
+    padding: clamp(8px, 1vw, 16px) clamp(12px, 1.25vw, 18px) clamp(14px, 1.4vw, 20px);
+    margin: 0;
+  }
+  .so-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    padding: clamp(12px, 1.1vw, 16px) clamp(14px, 2.3vw, 34px) clamp(14px, 1.3vw, 18px);
+    border: 1px solid rgb(10 90 51 / 0.28);
+    border-radius: 10px;
+    background: #fff;
+    transition: transform 380ms var(--ease-out), box-shadow 380ms var(--ease-out), border-color 380ms var(--ease-out);
+    animation: so-card 760ms var(--ease-out) calc(160ms + var(--i) * 90ms) both;
+  }
+  .so-card:hover {
+    transform: translateY(-6px);
+    border-color: rgb(10 90 51 / 0.55);
+    box-shadow: 0 22px 40px -22px rgb(10 50 30 / 0.45);
+  }
+  .so-card__badge {
+    display: grid;
+    justify-items: center;
+    width: min(100%, 268px);
+    padding: 6px 8px 8px;
+    border: 4px solid var(--so-red);
+    border-radius: 18px;
+    background: var(--so-yellow);
+    color: var(--so-red);
+    font-family: var(--so-font);
+    line-height: 0.95;
+    box-shadow: 0 4px 0 rgb(0 0 0 / 0.08);
+  }
+  .so-card__top {
+    font-weight: 900;
+    font-size: clamp(1.3rem, 2.4vw, 2.3rem);
+    text-transform: uppercase;
+  }
+  .so-card__price {
+    font-weight: 900;
+    font-size: clamp(2.6rem, 5.1vw, 4.9rem);
+    letter-spacing: -0.03em;
+  }
+  .so-card__note {
+    margin-top: 2px;
+    color: #a00c12;
+    font: 800 clamp(0.85rem, 1.35vw, 1.3rem) / 1.1 var(--font-sans);
+    text-transform: lowercase;
+  }
+  .so-card__note::first-letter {
+    text-transform: none;
+  }
+
+  .so-card__media {
+    position: relative;
+    width: 100%;
+    height: clamp(170px, 19vw, 280px);
+    margin-block: clamp(8px, 1vw, 16px) clamp(10px, 1.2vw, 18px);
+  }
+  .so-card__img {
+    position: absolute;
+    object-fit: contain;
+    transition: transform 520ms var(--ease-out);
+  }
+  .so-card:hover .so-card__img {
+    transform: scale(1.04);
+  }
+  .so-card__media--single .so-card__img--0 {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  /* Two boxes, back one higher-left, front one lower-right, slight overlap. */
+  .so-card__media--pair .so-card__img--0 {
+    left: 0;
+    top: 0;
+    width: 70%;
+    height: 72%;
+  }
+  .so-card__media--pair .so-card__img--1 {
+    right: 0;
+    bottom: 0;
+    width: 74%;
+    height: 76%;
+    z-index: 1;
+  }
+  /* Roast beef at the back and centre, the other two packs overlapping in front. */
+  .so-card__media--trio .so-card__img--0 {
+    left: 20%;
+    top: 0;
+    width: 60%;
+    height: 58%;
+  }
+  .so-card__media--trio .so-card__img--1 {
+    left: 0;
+    bottom: 0;
+    width: 52%;
+    height: 56%;
+    z-index: 1;
+  }
+  .so-card__media--trio .so-card__img--2 {
+    right: 0;
+    bottom: 0;
+    width: 52%;
+    height: 56%;
+    z-index: 2;
+  }
+  .so-card__missing {
+    display: grid;
+    place-content: center;
+    gap: 4px;
+    padding: 8px;
+    border: 2px dashed rgb(10 90 51 / 0.35);
+    border-radius: 10px;
+    background: repeating-linear-gradient(135deg, #f6f6f3 0 10px, #efefea 10px 20px);
+    color: #3d4a42;
+    text-align: center;
+    filter: none;
+  }
+  .so-card__missing b {
+    font: 800 0.8rem / 1.1 var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--so-red);
+  }
+  .so-card__missing small {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+  .so-card__missing code {
+    font-size: 0.6rem;
+    word-break: break-all;
+    opacity: 0.7;
+  }
+  .so-card__name {
+    align-self: stretch;
+    margin-top: auto;
+    font: 500 clamp(1rem, 1.42vw, 1.35rem) / 1.2 var(--font-sans);
+    color: #111;
+  }
+  .so-card__name span {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.82em;
+    font-weight: 400;
+    color: #333;
+  }
+  .so-card__regular {
+    align-self: stretch;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid var(--so-red);
+    text-align: center;
+    font: 400 clamp(1rem, 1.42vw, 1.35rem) / 1.2 var(--font-sans);
+  }
+  .so-card__regular strong {
+    font-weight: 800;
+  }
+
+  /* ---------- Green strip ---------- */
+  .so__strip {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 32px;
+    padding: clamp(18px, 2.4vw, 34px) clamp(18px, 3.4vw, 50px) clamp(22px, 2.4vw, 34px);
+    background: var(--so-green);
+    border-top: 5px solid var(--so-red);
+    color: #fff;
+  }
+  .so__slogan {
+    font: 600 clamp(1.5rem, 2.7vw, 2.6rem) / 1 var(--font-hand);
+    transform: rotate(-2deg);
+  }
+  .so__there {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    margin-right: 6%;
+  }
+  .so__spar--small {
+    font-size: clamp(1rem, 1.7vw, 1.6rem);
+    padding: 3px 26px;
+    box-shadow: 0 0 0 3px #fff;
+  }
+  .so__there-text {
+    font: 600 clamp(1.5rem, 2.4vw, 2.3rem) / 1 var(--font-hand);
+    border-bottom: 3px solid var(--so-red);
+  }
+  .so__small {
+    position: absolute;
+    right: clamp(12px, 1.4vw, 20px);
+    bottom: 8px;
+    font-size: 0.72rem;
+    opacity: 0.9;
+  }
+
+  @keyframes so-title {
+    from {
+      transform: translate3d(0, 0.18em, 0);
+    }
+  }
+  @keyframes so-card {
+    from {
+      transform: translate3d(0, 22px, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .so__title,
+    .so-card {
+      animation: none;
+    }
+    .so-card:hover,
+    .so-card:hover .so-card__img {
+      transform: none;
+    }
+  }
+
+  /* ---------- Tablet: 2 × 2 ---------- */
+  @media (max-width: 1100px) {
+    .so__cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .so-card__media {
+      height: clamp(190px, 30vw, 300px);
+    }
+    .so-card__top {
+      font-size: clamp(1.4rem, 3.4vw, 2.2rem);
+    }
+    .so-card__price {
+      font-size: clamp(2.8rem, 7vw, 4.6rem);
+    }
+    .so-card__name,
+    .so-card__regular {
+      font-size: clamp(1rem, 2.2vw, 1.3rem);
+    }
+  }
+
+  /* ---------- Mobile: compact banner, stacked cards ---------- */
+  @media (max-width: 640px) {
+    .so__banner {
+      height: auto;
+      padding: 18px 16px 44px;
+      display: grid;
+      gap: 14px;
+    }
+    .so__brand,
+    .so__script,
+    .so__head {
+      position: static;
+      transform: none;
+      margin: 0;
+    }
+    .so__brand {
+      justify-self: start;
+    }
+    .so__spar {
+      font-size: 1.35rem;
+    }
+    .so__store {
+      font-size: 1rem;
+    }
+    .so__script {
+      position: absolute;
+      right: 16px;
+      top: 18px;
+      font-size: 1.3rem;
+    }
+    .so__title {
+      font-size: clamp(2.3rem, 12.4vw, 3.6rem);
+    }
+    .so__sub {
+      margin: 10px 0 0;
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      gap: 6px 10px;
+    }
+    .so__wave {
+      height: 28px;
+    }
+    .so__cards {
+      grid-template-columns: 1fr;
+      padding: 10px 16px 18px;
+      gap: 12px;
+    }
+    .so-card {
+      padding: 14px 18px 16px;
+    }
+    .so-card__top {
+      font-size: 1.6rem;
+    }
+    .so-card__price {
+      font-size: 3.6rem;
+    }
+    .so-card__media {
+      height: 210px;
+    }
+    .so-card__name,
+    .so-card__regular {
+      font-size: 1.05rem;
+    }
+    .so__there {
+      margin: 0;
+    }
+    .so__small {
+      position: static;
+      width: 100%;
+    }
+  }
+</style>
