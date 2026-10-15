@@ -11,6 +11,7 @@ import { initMagnetic } from './magnetic';
 import { initTilt } from './tilt';
 import { initCounter } from './counter';
 import { initOffers } from './offers';
+import { initFoodMenu } from './food-menu';
 
 const cleanups: Cleanup[] = [];
 let scenesCleanup: Cleanup | null = null;
@@ -46,7 +47,7 @@ export function boot() {
   // The Special Offers banner reuses the same controller for its restrained background depth.
   const offersHero = document.querySelector<HTMLElement>('[data-offers-hero]');
   if (offersHero) cleanups.push(initHeroStage(offersHero));
-  cleanups.push(initMagnetic(), initTilt(), initCounter(), initOffers());
+  cleanups.push(initMagnetic(), initTilt(), initCounter(), initOffers(), initFoodMenu());
 
   whenIdle(() => void syncScrollScenes());
   cleanups.push(

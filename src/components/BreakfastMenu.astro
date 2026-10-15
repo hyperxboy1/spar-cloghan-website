@@ -1,0 +1,106 @@
+---
+/** Breakfast menu body: featured roll → 4 for €2.99 deals → Half / Full Irish. */
+import { Image } from 'astro:assets';
+import { breakfastMenu as bm } from '../data/menu';
+import breakfast from '../assets/menu/breakfast.jpg';
+---
+
+<div class="bk">
+  <div class="bk-roll">
+    <div class="bk-roll__media">
+      <Image src={breakfast} alt="Rashers and sausages at the hot counter" widths={[480, 720, 960]} sizes="(max-width: 860px) 100vw, 50vw" quality={76} loading="lazy" style="object-position:70% 40%" />
+    </div>
+    <div class="bk-roll__text">
+      <p class="bk-eyebrow">Our breakfast favourite</p>
+      <h4 class="display bk-roll__name">{bm.roll.name}</h4>
+      <p class="bk-roll__desc">{bm.roll.description}</p>
+      <p class:list={['bk-roll__price', { 'is-ask': !bm.roll.price }]}>{bm.roll.price ?? 'Ask in store for today’s price'}</p>
+    </div>
+  </div>
+
+  <div class="bk-deals">
+    <h4 class="bk-deals__head"><span class="display">{bm.dealsHeadline}</span><small>4 of the same item</small></h4>
+    <ul class="bk-deals__grid" role="list">
+      {
+        bm.deals.map((d) => (
+          <li class="bk-deal">
+            <div class="bk-deal__media">
+              {d.photo ? (
+                <Image src={breakfast} alt={`${d.name} at the hot counter`} widths={[320, 480]} sizes="(max-width: 600px) 45vw, 18vw" quality={74} loading="lazy" style={`object-position:${d.photo.focal};transform:scale(${d.photo.zoom});transform-origin:${d.photo.focal}`} />
+              ) : (
+                <span class="bk-nophoto">Photo to come</span>
+              )}
+            </div>
+            <p class="bk-deal__qty">4</p>
+            <h5 class="bk-deal__name">{d.name}</h5>
+            <p class="bk-deal__price">{d.price}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <ul class="bk-plated" role="list">
+    {
+      bm.plated.map((p) => (
+        <li class="bk-plate">
+          <div class="bk-plate__media">
+            <span class="bk-nophoto">Photo to come</span>
+          </div>
+          <div class="bk-plate__text">
+            <h4 class="display bk-plate__name">{p.name}</h4>
+            <p class="bk-plate__note">☕ {p.note}</p>
+          </div>
+          <p class="bk-plate__price">{p.price}</p>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .bk { display: grid; gap: clamp(28px, 4vw, 52px); }
+  .bk-eyebrow { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); }
+  .bk-roll {
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center;
+    border-radius: 26px; overflow: hidden; background: var(--paper); box-shadow: var(--shadow-2);
+  }
+  .bk-roll__media { height: clamp(260px, 30vw, 420px); }
+  .bk-roll__media :global(img), .bk-deal__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .bk-roll__text { display: grid; gap: 12px; padding: clamp(24px, 4vw, 48px); }
+  .bk-roll__name { font-size: clamp(2.8rem, 1.6rem + 3.6vw, 5rem); line-height: 0.9; }
+  .bk-roll__desc { font-size: var(--step-1); color: var(--muted); }
+  .bk-roll__price { font-family: var(--font-display); font-size: 2.6rem; color: var(--red); }
+  .bk-roll__price.is-ask { font-family: var(--font-sans); font-size: 1rem; font-weight: 700; color: var(--ink); }
+
+  .bk-deals { border-radius: 26px; background: var(--red); color: #fff; padding: clamp(20px, 3vw, 36px); }
+  .bk-deals__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 20px; }
+  .bk-deals__head .display { font-size: clamp(3rem, 2rem + 4vw, 5.6rem); line-height: 0.9; color: #ffe500; }
+  .bk-deals__head small { font-size: 1rem; font-weight: 600; }
+  .bk-deals__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0; }
+  .bk-deal { position: relative; display: grid; align-content: start; gap: 4px; padding: 10px 10px 16px; border-radius: 18px; background: var(--paper); color: var(--ink); text-align: center; }
+  .bk-deal__media { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--cream-2); margin-bottom: 8px; }
+  .bk-deal__qty { position: absolute; top: 16px; left: 16px; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #ffe500; color: var(--red); font-family: var(--font-display); font-size: 1.6rem; box-shadow: 0 0 0 3px var(--red); }
+  .bk-deal__name { font-family: var(--font-serif); font-size: 1.25rem; }
+  .bk-deal__price { font-family: var(--font-display); font-size: 2.4rem; line-height: 1; color: var(--red); }
+
+  .bk-plated { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 0; }
+  .bk-plate { display: grid; grid-template-rows: auto 1fr auto; border-radius: 24px; overflow: hidden; background: var(--paper); box-shadow: var(--shadow-1); }
+  .bk-plate__media { aspect-ratio: 16 / 9; background: var(--cream-2); }
+  .bk-plate__text { display: grid; gap: 8px; padding: 22px 24px 6px; }
+  .bk-plate__name { font-size: clamp(1.8rem, 1.2rem + 1.6vw, 2.6rem); line-height: 0.95; }
+  .bk-plate__note { font-weight: 700; color: var(--green); }
+  .bk-plate__price { padding: 6px 24px 22px; font-family: var(--font-display); font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem); color: var(--red); }
+  .bk-nophoto { display: grid; place-items: center; height: 100%; min-height: 120px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: repeating-linear-gradient(135deg, var(--cream-2) 0 12px, var(--cream) 12px 24px); }
+
+  @media (max-width: 900px) {
+    .bk-roll { grid-template-columns: 1fr; }
+    .bk-roll__media { min-height: 220px; aspect-ratio: 16 / 10; }
+    .bk-deals__grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .bk-plated { grid-template-columns: 1fr; }
+    .bk-deal__name { font-size: 1.05rem; }
+    .bk-deal__price { font-size: 2rem; }
+  }
+</style>

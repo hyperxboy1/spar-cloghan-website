@@ -130,7 +130,7 @@ const cards = [
     position: relative;
     z-index: 10;
     width: min(100% - 2 * var(--gutter), var(--maxw));
-    margin: -64px auto 0;
+    margin: clamp(40px, 6vw, 80px) auto 0;
   }
   .features__grid {
     display: grid;

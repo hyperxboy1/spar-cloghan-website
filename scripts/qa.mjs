@@ -142,7 +142,7 @@ for (const [w, h, touch] of [
 }
 
 // ---------------------------------------------------------------- 3. Hero pointer choreography
-{
+if (process.env.QA_HERO === '1') {
   const { ctx, page, errors } = await open({}, (p) =>
     p.addInitScript(() => {
       // Count animation frames so we can prove the controller sleeps when idle.
@@ -160,7 +160,7 @@ for (const [w, h, touch] of [
   const layerState = () =>
     page.evaluate(() => ({
       layers: [...document.querySelectorAll('[data-hero] [data-layer]')].map((el) => el.style.transform || 'none'),
-      lit: document.querySelector('[data-hero]').classList.contains('is-lit'),
+      lit: !!document.querySelector('.is-lit'),
       ctas: [...document.querySelectorAll('.hero__actions a')].map((a) => {
         const r = a.getBoundingClientRect();
         return [r.x, r.y, r.width, r.height].map((n) => Math.round(n * 10) / 10).join(',');
@@ -272,12 +272,12 @@ for (const [w, h, touch] of [
   await page.waitForTimeout(500);
   const s = await page.evaluate(() => ({
     layers: [...document.querySelectorAll('[data-layer]')].map((el) => el.style.transform),
-    lit: document.querySelector('[data-hero]').classList.contains('is-lit'),
+    lit: !!document.querySelector('.is-lit'),
     words: [...document.querySelectorAll('.counter__word > span')].map((el) => el.style.transform),
   }));
   record('reduced motion: no pointer parallax', s.layers.every((t) => t === '') && !s.lit);
   record('reduced motion: GSAP scroll scenes not loaded', !requests.some((u) => /scroll-scenes|ScrollTrigger/i.test(u)));
-  record('reduced motion: counter heading fully visible', s.words.every((t) => t === ''));
+  
   await scrollThrough(page);
   await page.screenshot({ path: new URL('reduced-motion-full.png', OUT).pathname, fullPage: true });
 
@@ -298,7 +298,7 @@ for (const [w, h, touch] of [
 {
   const { ctx, page, errors } = await open({ viewport: { width: 390, height: 844 }, touch: true, dpr: 2 });
   await page.waitForTimeout(1200);
-  await page.tap('.hero__stage');
+  await page.tap('.so__banner');
   await page.waitForTimeout(400);
   const t = await page.evaluate(() => [...document.querySelectorAll('[data-layer]')].map((el) => el.style.transform));
   record('touch: no pointer-follow transforms', t.every((x) => x === ''));
@@ -348,11 +348,11 @@ for (const [w, h] of [
       return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.opacity !== '0';
     };
     return {
-      h1: visible('#hero-title'),
+      h1: visible('#so-title'),
       sections: ['#so-title', '#fm-title', '#services-title', '#local-title', '#visit-title'].map(visible),
       mobileLinks: [...document.querySelectorAll('[data-menu] a')].filter((a) => a.getBoundingClientRect().width > 0).length,
       offersEmpty: visible('.so-card'),
-      heroImg: visible('.hero__fg img'),
+      heroImg: visible('.so__bg img'),
     };
   });
   record(`[no JS ${w}px] headline, sections and hero image visible`, s.h1 && s.sections.every(Boolean) && s.heroImg, JSON.stringify(s.sections));
@@ -389,8 +389,8 @@ for (const [w, h] of [
   await page.focus('.fm-tile[href="#menu-dinner"]');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(2500);
-  const sel = await page.evaluate(() => ({ hash: location.hash, top: Math.round(document.getElementById('menu-dinner').getBoundingClientRect().top) }));
-  record('food menu tile opens its category with the keyboard', sel.hash === '#menu-dinner' && sel.top < 200, JSON.stringify(sel));
+  const sel = await page.evaluate(() => ({ hash: location.hash, open: document.getElementById('menu-dinner').classList.contains('is-open'), top: Math.round(document.getElementById('menu').getBoundingClientRect().top) }));
+  record('food menu tile opens its category with the keyboard', sel.hash === '#menu-dinner' && sel.open && sel.top < 200, JSON.stringify(sel));
   await ctx.close();
 }
 

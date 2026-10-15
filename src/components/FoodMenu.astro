@@ -9,11 +9,12 @@ import Tbc from './Tbc.astro';
 import { menu, dinnerDeals } from '../data/menu';
 import { business } from '../data/business';
 import { isShown } from '../data/site';
+import BreakfastMenu from './BreakfastMenu.astro';
 
 const categories = menu.map((c) => ({ ...c, items: c.items.filter((i) => isShown(i.status)) }));
 ---
 
-<section class="fm" id="menu" aria-labelledby="fm-title">
+<section class="fm" id="menu" aria-labelledby="fm-title" data-food-menu>
   <div class="fm__inner">
     <header class="fm__head">
       <p class="kicker">Deli & food</p>
@@ -51,7 +52,24 @@ const categories = menu.map((c) => ({ ...c, items: c.items.filter((i) => isShown
 
   {
     categories.map((c, i) => (
-      <article class:list={['fm-cat', { 'fm-cat--flip': i % 2 === 1 }]} id={`menu-${c.id}`} aria-labelledby={`menu-${c.id}-title`}>
+      <article class:list={['fm-cat', { 'fm-cat--flip': i % 2 === 1, 'fm-cat--wide': c.id === 'breakfast' }]} id={`menu-${c.id}`} aria-labelledby={`menu-${c.id}-title`} data-food-cat={c.id}>
+        <a class="fm-back fm-back--top" href="#menu" data-food-back>← Back to All Categories</a>
+        {c.id === 'breakfast' ? (
+          <div class="fm-cat__body">
+            <h3 id={`menu-${c.id}-title`} class="display fm-cat__title">{c.label}</h3>
+            <BreakfastMenu />
+            <div class="fm-cat__actions">
+              <a class="fm-call" href={business.phone.href}>
+                <span class="fm-call__icon"><Icon name="phone" size={24} /></span>
+                <span class="fm-call__text">
+                  <span>{c.callLabel}</span>
+                  <strong>{business.phone.display}</strong>
+                </span>
+              </a>
+            </div>
+            <a class="fm-back" href="#menu" data-food-back>← Back to All Categories</a>
+          </div>
+        ) : (<>
         <div class="fm-cat__media">
           <Image src={c.image} alt={c.imageAlt} widths={[480, 720, 960]} sizes="(max-width: 860px) 100vw, 45vw" quality={76} loading="lazy" style={`object-position:${c.focal}`} />
         </div>
@@ -102,10 +120,9 @@ const categories = menu.map((c) => ({ ...c, items: c.items.filter((i) => isShown
               </a>
             )}
           </div>
-          <a class="fm-back" href="#menu">
-            ↑ All food categories
-          </a>
+          <a class="fm-back" href="#menu" data-food-back>← Back to All Categories</a>
         </div>
+        </>)}
       </article>
     ))
   }
@@ -227,6 +244,39 @@ const categories = menu.map((c) => ({ ...c, items: c.items.filter((i) => isShown
   }
   .fm-cat--flip .fm-cat__media {
     order: 2;
+  }
+  .fm-cat--wide {
+    grid-template-columns: 1fr;
+  }
+  .fm-back--top {
+    grid-column: 1 / -1;
+    justify-self: start;
+    padding: 0 18px;
+    border-radius: var(--radius-pill);
+    box-shadow: inset 0 0 0 1.5px var(--line);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  /* Click-to-open: with JavaScript, only the chosen category is shown (in place of the grid).
+     Without JavaScript every menu stays visible below the grid. */
+  :global(.js) .fm-cat:not(.is-open) {
+    display: none;
+  }
+  :global(.js) .fm.is-open .fm__grid {
+    display: none;
+  }
+  :global(.js) .fm .fm-cat.is-open {
+    padding-top: 0;
+    animation: fm-open 360ms var(--ease-out) both;
+  }
+  :global(.no-js) .fm-back--top {
+    display: none;
+  }
+  @keyframes fm-open {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
   }
   .fm-cat__media {
     border-radius: 26px;

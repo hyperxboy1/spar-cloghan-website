@@ -46,7 +46,7 @@ export const menu: MenuCategory[] = [
     imageAlt: 'Trays of sausages, rashers and hash browns in the hot counter',
     focal: '50% 55%',
     intro: 'Made up at the hot counter — build your roll or grab a breakfast to go.',
-    callLabel: 'Call for today’s breakfast',
+    callLabel: 'Call About Breakfast',
     items: [
       { name: 'Breakfast rolls', note: 'Built your way', status: 'approved' },
       { name: 'Sausages', status: 'approved' },
@@ -63,7 +63,7 @@ export const menu: MenuCategory[] = [
     imageAlt: 'Roast turkey and ham with roast potatoes at the hot counter',
     focal: '50% 50%',
     intro: 'Hot dinners from the counter, with all the trimmings.',
-    callLabel: 'Phone to order',
+    callLabel: 'Call About Today’s Dinners',
     items: [
       { name: 'Roast turkey & ham', note: 'With roast potatoes, mash and gravy', status: 'review' },
       { name: 'Roast of the day', note: 'Ask what’s carving today', status: 'review' },
@@ -95,7 +95,7 @@ export const menu: MenuCategory[] = [
     imageAlt: 'Platters of sandwiches on white and brown bread',
     focal: '50% 50%',
     intro: 'Feeding a crowd? Order sandwich platters and finger food for meetings, parties and family occasions.',
-    callLabel: 'Call to place a catering order',
+    callLabel: 'Call to Order Catering',
     items: [
       { name: 'Sandwich platters', note: 'White and brown bread, mixed fillings', status: 'approved' },
       { name: 'Finger food', status: 'approved' },
@@ -103,3 +103,29 @@ export const menu: MenuCategory[] = [
     ],
   },
 ];
+
+/**
+ * Breakfast menu (shown when the Breakfast tile is opened). Order is fixed:
+ * 1. Breakfast Roll (featured) · 2. 4 for €2.99 deals · 3. Half / Full Irish.
+ * `price` on the roll stays undefined until the shop confirms it.
+ * `photo` = { focal, zoom } crop of the supplied breakfast counter photo, or null where no
+ * matching photograph has been supplied yet (a plain "photo to come" panel is shown).
+ */
+export const breakfastMenu = {
+  roll: {
+    name: 'Breakfast Roll',
+    description: 'Made up at the hot counter, the way you like it.',
+    price: undefined as string | undefined,
+  },
+  dealsHeadline: '4 for €2.99',
+  deals: [
+    { name: 'Hash Browns', price: '€2.99', photo: { focal: '30% 8%', zoom: 1.9 } },
+    { name: 'Sausage Rolls', price: '€2.99', photo: null },
+    { name: 'Sausages', price: '€2.99', photo: { focal: '25% 52%', zoom: 1.9 } },
+    { name: 'Puddings', price: '€2.99', photo: null },
+  ],
+  plated: [
+    { name: 'Half Irish Breakfast', price: '€8.99', note: 'Tea or coffee included.' },
+    { name: 'Full Irish Breakfast', price: '€10.99', note: 'Tea or coffee included.' },
+  ],
+};
